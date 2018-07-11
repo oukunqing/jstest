@@ -111,23 +111,23 @@
                 this.createRowTree(container, data, tree, pid, isAppend);
             }
         },
-        createRowTree: function (container, data, tree, pid, isAppend) {
+        createRowTree: function (container, data, tree, pids, isAppend) {
             isAppend = $.isBoolean(isAppend, false);
-            console.log('container: ', container, ', isAppend: ', isAppend, ', pid: ', pid, ', data: ', data);
+            //console.log('container: ', container, ', isAppend: ', isAppend, ', pid: ', pid, ', data: ', data);
             for (var i in data) {
                 var d = data[i], isArray = $.isArray(d), treeData = d.treeData || {};
-                if (isArray || pid.indexOf(treeData.pid) >= 0) {
+                if (isArray || pids.indexOf(treeData.pid) >= 0) {
                     var rowIndex = container.rows.length;
                     if (isAppend) {
                         rowIndex = this.findRowIndex(container, treeData.pid);
 
-                        console.log('createRowTree: ', 'rowIndex:', rowIndex, ', pid:', pid, ', id:', treeData.id)
+                        console.log('createRowTree: ', 'rowIndex:', rowIndex, ', pid:', pids, ', id:', treeData.id)
                     }
                     this.insertCell(container.insertRow(rowIndex), data[i]);
 
                     var key = this.tt.buildKey(treeData.id), hasChild = this.checkChild(key, tree);
                     if (hasChild) {
-                        console.log('isAppend:', isAppend);
+                        //console.log('isAppend:', isAppend);
                         this.createRowTree(container, data, tree, [treeData.id], isAppend);
                     }
                 }
@@ -147,7 +147,7 @@
                 isRow = $.isObject(rowData) && !$.isEmpty(rowData),
                 isTree = showTree && $.isObject(treeData) && !$.isEmpty(treeData), 
                 id = isTree ? treeData.id : '';
-                console.log('treeData: ', treeData);
+                //console.log('treeData: ', treeData);
             for (var i = 0; i < cols; i++) {
                 var dr = cellData[i], cell = row.insertCell(cellIndex);
                 if (isRow && i === 0) {
@@ -159,7 +159,9 @@
                         row.setAttribute('id', that.tt.buildId(id));
                         //row.setAttribute('tree', '{{id:{id},pid:{pid},level:{level}}}'.format(treeData));
                         row.setAttribute('tree', '{id:' + treeData.id + ',pid:' + treeData.pid + ',level:' + treeData.level + '}');
+                        that.tt.setMap(id, false);
                         content = that.tt.buildSpace(treeData.level) + this.tt.buildSwitch(id) + content;
+                        content += ' [ pid: ' + treeData.pid + ' ]';
                         cell.innerHTML = content;
 
                         var btnSwitch = doc.getElementById(that.tt.buildSwitchId(id));
@@ -209,30 +211,89 @@
             return false;
         },
         findRowIndex: function (container, pid) {
-            var childs = this.tt.getChildIds(pid), len = childs.length;
+            var childs = this.tt.getChildIds(pid), len = childs.length, rowIndex = -1, realPid = 0;
             if (len > 0) {
-                var obj = null, found = false, realName = '';
+                var obj = doc.getElementById(this.tt.buildId(pid)), rowId = '', idx = container.rows.length;
+                
                 for (var i = len - 1; i >= 0; i--) {
-                    obj = document.getElementById(this.tt.buildId(childs[i])), found = false;
+                    obj = document.getElementById(this.tt.buildId(childs[i]));
                     if (obj != null) {
-                        realName = obj.getAttribute('id');
-                        found = true;
+                        rowId = obj.getAttribute('id'), realPid = childs[i];
                         break;
                     }
-                    if (found) { break; }
                 }
-                if(realName === ''){
-                    obj = doc.getElementById(this.tt.buildId(pid)), realName = obj !== null ? obj.getAttribute('id') : '';
+                if(rowId === ''){
+                    obj = doc.getElementById(this.tt.buildId(pid));
+                    if(obj != null){
+                        rowId = obj.getAttribute('id'), realPid = pid;
+                    }
                 }
+
+                if(obj != null){
+                    //rowId = obj.getAttribute('id'), realPid = pid;
+                }
+
                 for (var i = 0; i < container.rows.length; i++) {
                     var id = container.rows[i].getAttribute('id');
-                    if (id !== null && id === realName) {
+                    if (id !== null && id === rowId) {
+                        idx = i + 1;
+                        break;
+                    }
+                }
+
+
+                var tree = this.tt.tree[this.tt.buildKey(realPid)];
+                rowIndex = this.findRowIndex2(tree, realPid, 0);
+
+                console.log('idx: ', pid, idx, tree);
+                console.log('rowIndex: ', rowIndex + idx);
+
+
+                return rowIndex + idx;
+
+                for (var i = len - 1; i >= 0; i--) {
+                    obj = document.getElementById(this.tt.buildId(childs[i]));
+                    if (obj != null) {
+                        rowId = obj.getAttribute('id'), realPid = childs[i];
+                        break;
+                    }
+                }
+                if(rowId === ''){
+                    obj = doc.getElementById(this.tt.buildId(pid));
+                    if(obj != null){
+                        rowId = obj.getAttribute('id'), realPid = pid;
+                    }
+                }
+            console.log('findRowIndex: ', 'pid:', pid, ', childs: ', childs, ', rowId: ', rowId, ', realPid: ', realPid);
+
+                for (var i = 0; i < container.rows.length; i++) {
+                    var id = container.rows[i].getAttribute('id');
+                    if (id !== null && id === rowId) {
+                    console.log('id: ', id);
                         return i + 1;
                     }
                 }
+
+
+
+
             } else {
                 return container.rows.length;
             }
+        },
+        findRowIndex2: function(tree, pid, rowIndex){
+            for(var i in tree){
+                //console.log('22i:', i, tree[i]);
+                var id = tree[i], childs = this.tt.tree[this.tt.buildKey(id)];
+                if(!this.tt.hasMap(id)){
+                    return rowIndex;
+                }
+                rowIndex++;
+                if($.isArray(childs)){
+                    this.findRowIndex2(childs, tree[i], rowIndex);
+                }
+            }
+            return rowIndex;
         }
     };
 
@@ -240,6 +301,7 @@
         this.isTree = $.isBoolean(isTree, false);
         this.data = {};
         this.tree = {};
+        this.map = {};
     }
 
     tableTree.prototype = {
@@ -275,6 +337,20 @@
                 }
             }
         },
+        setMap: function(id, isDel){
+            var key = 'm_' + id;
+            if(isDel){
+                if(!$.isUndefined(this.map[key])){
+                    delete this.map[key];
+                }
+            } else {
+                this.map[key] = 1;
+            }
+        },
+        hasMap: function(id){
+            var key = 'm_' + id;
+            return !$.isUndefined(this.map[key]);
+        },
         isExist: function(key){
             return !$.isUndefined(this.data[key]);
         },
@@ -300,8 +376,8 @@
                     }
                 }
             }
-            //arr = this.quickSort2(arr, 'level'), len = arr.length;
-            console.log('arr: ', arr);
+            arr = this.quickSort2(arr, 'level'), len = arr.length;
+            //console.log('arr: ', arr);
             for (var i = 0; i < len; i++) {
                 var dr = arr[i].data, isArray = $.isArray(dr), treeData = dr.treeData;
                 var isTree = $.isObject(treeData) && !$.isEmpty(treeData);
@@ -364,7 +440,7 @@
             for (var i = 1; i < c; i++) {
                 arr[i][key] < pivot[key] ? left.push(arr[i]) : right.push(arr[i]);
             }
-            return this.quickSort(left, key).concat(pivot, this.quickSort(right, key));
+            return this.quickSort2(left, key).concat(pivot, this.quickSort2(right, key));
         },
         quickSort: function (arr, key) {
             if (0 === arr.length) {
