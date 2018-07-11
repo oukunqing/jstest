@@ -831,7 +831,7 @@ var $ = $ || {
         throwFormatError((typeof o) + '.format is not a function');
     };
 }();
-
+/*
 
 console.log(new Date().getTime());
 
@@ -1084,3 +1084,4 @@ for (var k in arrKey) {
     console.log('kk: ', k);
 }
 
+*/
