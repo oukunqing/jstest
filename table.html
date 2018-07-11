@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <style type="text/css">
+        body{font-size:12px;}
+        .tblist{border-collapse:collapse;}
+        .tblist td{border:solid 1px #ccc; padding:5px;}
+
+        .green{background:#008000;}
+    </style>
+    <script type="text/javascript" src="base.js"></script>
+    <script type="text/javascript" src="table.js"></script>
+</head>
+<body>
+<table id="tblist" class="tblist"></table>
+<br />
+<table id="tblist1" class="tblist"></table>
+</body>
+</html>
+<script type="text/javascript">
+    var headData = [
+        [{ content: '表头11', style: { background: '#f00', textAlign: 'center' } }, { content: '表头12', style: {} }, { content: '表头13', style: {} }],
+        [{ content: '表头21', style: {}, event: { click: function () { alert(this.innerHTML); } } }, { content: '表头22', style: {} }, { content: '表头23', style: {} }]
+    ]
+    var bodyData = [
+        [{ isRow: true, index:0, isTree: true, tree: { id: 1, pid: 0, level: 0 }, attribute: {id: 'tr1'}, event:{'dblclick': function(){alert(this.id);}} },
+            { content: '单元格11', style: {}, attribute: { id: 'td123', tree: '{id:1,pid:0,level:0}' }, className: 'green', event: { click: function() { alert(this.id); alert(this.getAttribute('tree')); } } },
+            { content: '单元格12', style: {} },
+            { content: '单元格13', style: {} }
+        ],
+        [{ isRow: true, index:0, isTree: true, tree: { id: 2, pid: 1, level: 1 }, attribute: {id: 'tr2'}, event:{'dblclick': function(){alert(this.id);}} },
+            { content: '单元格21', style: {} },
+            { content: '单元格22', style: {} },
+            { content: '单元格23', style: {} }
+        ],
+        [{ isRow: true, index:0, isTree: true, tree: { id: 4, pid: 3, level: 3 }, event:{'dblclick': function(){alert(this.id);}} },
+            { content: '单元格41', style: {} },
+            { content: '单元格42', style: {} },
+            { content: '单元格43', style: {} }
+        ],
+        [{ isRow: true, index:0, isTree: true, tree: { id: 3, pid: 2, level: 2 }, event:{'dblclick': function(){alert(this.id);}} },
+            { content: '单元格31', style: {} },
+            { content: '单元格32', style: {} },
+            { content: '单元格33', style: {} }
+        ],
+        [{ isRow: true, index:0, isTree: true, tree: { id: 5, pid: 1, level: 1 }, event:{'dblclick': function(){alert(this.id);}} },
+            { content: '单元格51', style: {} },
+            { content: '单元格52', style: {} },
+            { content: '单元格53', style: {} }
+        ]
+    ];
+    
+    var bodyData1 = [
+        ['单元格41', '单元格42', '单元格43', '单元格44'],
+        ['单元格51', '单元格52', '单元格53'],
+        ['单元格61', '单元格62', '单元格63']
+    ];
+    var bodyData2 = ['单元格71','单元格72','单元格73','单元格74','单元格75'];
+    
+    var tb = new $.table(document.getElementById('tblist'), {head:headData, body:bodyData}, {showTree:true});
+    var tb1 = new $.table(document.getElementById('tblist1'));
+
+    console.log('tb: ', tb);
+    //tb.createHead(headData);
+    //tb.createBody(bodyData);
+    tb1.createBody(bodyData1);
+    tb1.createBody(bodyData2);
+</script>
