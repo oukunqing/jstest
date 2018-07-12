@@ -72,6 +72,8 @@ ID:<input type="text" id="txtId" style="width:50px;" />
 
 <button onclick="toggleAll(false);">全部展开</button>
 <button onclick="toggleAll(true);">全部收缩</button>
+
+<button onclick="select();">按ID选中行</button>
 <br /><br />
 
 <table id="tblist" class="tblist"></table>
@@ -269,10 +271,8 @@ ID:<input type="text" id="txtId" style="width:50px;" />
     }, 5000);
 
     function toggle(collapse){
-        var id = parseInt(document.getElementById('txtId').value, 10);
-        if(!isNaN(id)){
-            tb.tree.toggle(id, collapse);
-        }
+        var id = document.getElementById('txtId').value;
+        tb.tree.toggle(id, collapse);
     }
 
     function toggleLevel(collapse){
@@ -282,14 +282,18 @@ ID:<input type="text" id="txtId" style="width:50px;" />
         }
     }
 
+
     function toggleAll(collapse){
         tb.tree.toggleAll(collapse);
     }
 
     function remove(){
-        var id = parseInt(document.getElementById('txtId').value, 10);
-        if(!isNaN(id)){
-            tb.tree.remove(id);
-        }
+        var id = document.getElementById('txtId').value;
+        tb.tree.remove(id);
+    }
+    
+    function select(){
+        var id = document.getElementById('txtId').value;
+        tb.tree.select(id);
     }
 </script>

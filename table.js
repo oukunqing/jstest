@@ -9,7 +9,7 @@ var $ = $ || {};
             return location.href.substring(0, location.href.lastIndexOf('/') + 1);
         },
         getFileName = function (fileName) {
-            if(fileName){
+            if (fileName) {
                 return fileName.substr(0, fileName.lastIndexOf('.'));
             } else {
                 var el = doc.getElementsByTagName('script');
@@ -239,7 +239,7 @@ var $ = $ || {};
                     //需要给相关的tr td 和 图标 设置 tid 属性
                     that.tree[action || 'toggle'](obj.getAttribute('tid'));
                     stopBubble();
-                }, 
+                },
                 trigger = that.options.trigger;
 
             for (var i = 0; i < cols; i++) {
@@ -276,7 +276,7 @@ var $ = $ || {};
                     cell.innerHTML = content;
                 }
 
-                if ($.isObject(dr)) {                    
+                if ($.isObject(dr)) {
                     if (isCellSpan(dr.rowSpan)) { cell.rowSpan = dr.rowSpan; }
                     if (isCellSpan(dr.colSpan)) { cell.colSpan = dr.colSpan; }
 
@@ -284,6 +284,7 @@ var $ = $ || {};
                 }
                 cellIndex++;
             }
+
             return cell;
         },
         insertCellProperty: function (container, dr) {
@@ -355,12 +356,12 @@ var $ = $ || {};
             }
             return rowCount;
         },
-        getRow: function(ids){
-            if($.isArray(ids)){
+        getRow: function (ids) {
+            if ($.isArray(ids)) {
                 var list = [];
-                for(var i in ids){
+                for (var i in ids) {
                     var tr = doc.getElementById(this.tree.buildId(ids[i]));
-                    if(tr != null){
+                    if (tr != null) {
                         list.push(tr);
                     }
                 }
@@ -460,7 +461,7 @@ var $ = $ || {};
             for (var i = 0; i < len; i++) {
                 var dr = bodyData[i];
                 //如果数据结构中没有 treeData 属性，则加上这个属性，因为排序时需要通过这个属性
-                if($.isUndefined(dr.treeData)){
+                if ($.isUndefined(dr.treeData)) {
                     dr.treeData = dr.tree || null;
                 }
                 var isArray = $.isArray(dr), treeData = isArray ? null : dr.treeData;
@@ -497,7 +498,7 @@ var $ = $ || {};
             }
             //按level层级排序(升序)
             datas = this.quickSort(datas, 'level');
-            
+
             return { datas: datas, trees: trees, pids: pids };
         },
         getRowIds: function (trees, collapse, rows) {
@@ -529,7 +530,7 @@ var $ = $ || {};
             return 'switch_' + id;
         },
         buildSwitch: function (id, width) {
-            var a = '<a id="{0}" tid="{1}" expand="1" class="{2}" style="cursor:pointer;margin-left:{3}px !important;"></a>'.format(
+            var a = '<a id="{0}" tid="{1}" expand="1" class="{2}" href="#" style="cursor:pointer;margin-left:{3}px !important;"></a>'.format(
                 this.buildSwitchId(id), id, this.options.className.expand, this.buildSpace(width)
             );
             return a;
@@ -577,6 +578,7 @@ var $ = $ || {};
             if (btnSwitch === null) {
                 return false;
             }
+            console.log('toggle: ', id, collapse);
             //判断收缩还是展开
             collapse = $.isBoolean(collapse, btnSwitch.getAttribute('expand') === '1');
             this.setSwitch(btnSwitch, collapse, false);
@@ -627,14 +629,14 @@ var $ = $ || {};
                 }
             }
         },
-        collapseLevel: function(level){
+        collapseLevel: function (level) {
             this.toggleLevel(level, true);
         },
-        expandLevel: function(level){
+        expandLevel: function (level) {
             this.toggleLevel(level, false);
         },
-        toggleAll: function(collapse){
-            for(var i in this.datas){
+        toggleAll: function (collapse) {
+            for (var i in this.datas) {
                 var dr = this.datas[i].treeData || {}, id = dr.id;
                 var obj = doc.getElementById(this.buildId(id)), btnSwitch = doc.getElementById(this.buildSwitchId(id));
                 if (obj !== null) {
@@ -642,15 +644,15 @@ var $ = $ || {};
                 }
                 //设置当前等级的子级为收缩状态，记录收缩状态
                 this.setSwitch(btnSwitch, collapse, false);
-                if(dr.level > 0){
+                if (dr.level > 0) {
                     this.setCollapse(id, [], collapse);
                 }
             }
         },
-        collapseAll: function(){
+        collapseAll: function () {
             this.toggleAll(true);
         },
-        expandAll: function(){
+        expandAll: function () {
             this.toggleAll(false);
         },
         remove: function (id, keepSelf) {
@@ -666,6 +668,12 @@ var $ = $ || {};
         },
         removeChild: function (id) {
             this.remove(id, true);
+        },
+        select: function (id) {
+            var btnSwitch = doc.getElementById(this.buildSwitchId(id));
+            if (btnSwitch !== null) {
+                btnSwitch.focus();
+            }
         },
         quickSort: function (arr, key) {
             if (0 === arr.length) {
