@@ -5,30 +5,30 @@ var $ = $ || {};
 !function ($) {
     var doc = document,
         head = document.getElementsByTagName('head')[0],
-        getLocationPath = function(){
+        getLocationPath = function () {
             return location.href.substring(0, location.href.lastIndexOf('/') + 1);
         },
-        getFileName = function(){
-            var el = doc.getElementsByTagName('script'); 
-            var src = el[el.length -1].src, arr = src.split('/'), len = arr.length; 
-            return arr[len-1].split('?')[0];
+        getFileName = function () {
+            var el = doc.getElementsByTagName('script');
+            var src = el[el.length - 1].src, arr = src.split('/'), len = arr.length;
+            return arr[len - 1].split('?')[0];
         },
         thisFileName = getFileName(),
-        getFilePath = function(name, path){
-            var el = doc.getElementsByTagName('script'); 
-            for (var i = 0,c = el.length; i < c; i++) {
+        getFilePath = function (name, path) {
+            var el = doc.getElementsByTagName('script');
+            for (var i = 0, c = el.length; i < c; i++) {
                 var si = el[i].src.lastIndexOf('/');
-                if(el[i].src != '' && el[i].src.substr(si + 1).split('?')[0] == name){
+                if (el[i].src != '' && el[i].src.substr(si + 1).split('?')[0] == name) {
                     return el[i].src.substring(0, si + 1).replace(path, '');
                 }
             }
         },
-        getLinkStyle = function(path, name){
+        getLinkStyle = function (path, name) {
             var link = document.createElement('link');
             var id = link.id = 'table-tree-style';
-            if(!doc.getElementById(id)){
-                link.setAttribute('rel','stylesheet');
-                link.setAttribute('type','text/css');
+            if (!doc.getElementById(id)) {
+                link.setAttribute('rel', 'stylesheet');
+                link.setAttribute('type', 'text/css');
                 link.setAttribute('href', path + name + '?' + new Date().getTime());
                 head.appendChild(link);
             }
@@ -79,15 +79,15 @@ var $ = $ || {};
     function table(options) {
         var that = this;
         that.options = extendProperty({
-            table: null, 
+            table: null,
             parent: doc.body,
-            showTree: false, 
+            showTree: false,
             treeCellIndex: 0,
             trigger: {
                 cell: '',   //['click', 'toggle']
                 row: ''     //['click', 'toggle']
             },
-            headData: [], 
+            headData: [],
             bodyData: [],
             treeOptions: {}
         }, options),
@@ -95,10 +95,10 @@ var $ = $ || {};
             that.tree = new tableTree(that.options.showTree, that.options.treeOptions || {});
 
         var trigger = that.options.trigger;
-        if($.isString(trigger.cell)){
+        if ($.isString(trigger.cell)) {
             that.options.trigger.cell = [trigger.cell, 'toggle'];
         }
-        if($.isString(trigger.row)){
+        if ($.isString(trigger.row)) {
             that.options.trigger.row = [trigger.row, 'toggle'];
         }
 
@@ -124,13 +124,13 @@ var $ = $ || {};
 
     table.prototype = {
         getContainer: function (isHead) {
-            try{
+            try {
                 if (isHead) {
                     return this.table.tHead || this.table.createTHead();
                 } else {
                     return this.table.tBodies[0] || this.table.createTBody();
                 }
-            }catch(e){
+            } catch (e) {
                 return this.table;
             }
         },
@@ -199,7 +199,7 @@ var $ = $ || {};
                 isRow = $.isObject(rowData) && !$.isEmpty(rowData),
                 isTree = showTree && $.isObject(treeData) && !$.isEmpty(treeData),
                 id = isTree ? treeData.id : '',
-                func = function(obj, action){
+                func = function (obj, action) {
                     //that.tree.toggle(this.getAttribute('tid'));
                     that.tree[action || 'toggle'](obj.getAttribute('tid'));
                     stopBubble();
@@ -226,13 +226,13 @@ var $ = $ || {};
 
                         addListener(btnSwitch, 'click', function () { func(this, 'toggle'); });
 
-                        if(that.options.trigger.cell){
+                        if (that.options.trigger.cell) {
                             cell.setAttribute('tid', id);
-                            addListener(cell, that.options.trigger.cell[0], function () {console.log('cellclick'); func(this, that.options.trigger.cell[1] || 'toggle'); });
+                            addListener(cell, that.options.trigger.cell[0], function () { console.log('cellclick'); func(this, that.options.trigger.cell[1] || 'toggle'); });
                         }
-                        if(that.options.trigger.row){
+                        if (that.options.trigger.row) {
                             row.setAttribute('tid', id);
-                            addListener(row, that.options.trigger.row[0], function () { console.log('rowclick');func(this, that.options.trigger.row[1] || 'toggle'); });
+                            addListener(row, that.options.trigger.row[0], function () { console.log('rowclick'); func(this, that.options.trigger.row[1] || 'toggle'); });
                         }
                     } else {
                         cell.innerHTML = content;
@@ -326,7 +326,7 @@ var $ = $ || {};
     };
 
     function tableTree(isTree, options) {
-        if($.isUndefined(options.className) || $.isEmpty(options.className)){
+        if ($.isUndefined(options.className) || $.isEmpty(options.className)) {
             getLinkStyle(getFilePath(thisFileName, getLocationPath()), 'table.css');
         }
 
@@ -339,7 +339,7 @@ var $ = $ || {};
         }, options);
 
         var className = this.options.className;
-        if($.isArray(className)){
+        if ($.isArray(className)) {
             this.options.className = {
                 expand: className[0],
                 collapse: className[1] || ''
@@ -426,7 +426,7 @@ var $ = $ || {};
                 }
             }
             //arr = this.quickSort2(arr, 'level');
-            
+
             for (var i = 0, c = arr.length; i < c; i++) {
 
                 var dr = arr[i].data, isArray = $.isArray(dr), treeData = dr.treeData;
@@ -454,7 +454,7 @@ var $ = $ || {};
 
             return { datas: datas, trees: trees, pids: pids };
         },
-        getRowIds: function(trees, expand, rows){
+        getRowIds: function (trees, expand, rows) {
             for (var i in trees) {
                 var id = trees[i];
                 if (!this.hasMap(id)) {
@@ -463,7 +463,7 @@ var $ = $ || {};
                 //rows.push(doc.getElementById(this.buildId(id)));
                 rows.push(id);
 
-                if(!this.isCollapse(id) || !expand){
+                if (!this.isCollapse(id) || !expand) {
                     var childs = this.trees[this.buildKey(id)];
                     if ($.isArray(childs)) {
                         this.getRowIds(childs, expand, rows);
@@ -488,49 +488,66 @@ var $ = $ || {};
             );
             return a;
         },
-        setSwitch: function(obj, collapse, isLevel){
+        setSwitch: function (obj, collapse, isLevel) {
+            if (obj === null) {
+                return false;
+            }
             obj.setAttribute('expand', collapse ? 0 : 1);
             obj.className = this.options.className[collapse ? 'collapse' : 'expand'];
             //obj.innerHTML = collapse ? ' ++ ' : ' -- ';
         },
-        setCollapse: function(pid, ids, collapse){
+        setCollapse: function (pid, ids, collapse) {
             var key = this.buildKey(pid);
-            if(collapse){
+            if (collapse) {
                 this.collapseCache[key] = [];
-                for(var i in ids){
+                for (var i in ids) {
                     this.collapseCache[key].push(ids[i]);
                 }
             } else {
-                if(!$.isUndefined(this.collapseCache[key])){
+                if (!$.isUndefined(this.collapseCache[key])) {
                     delete this.collapseCache[key];
                 }
             }
         },
-        isCollapse: function(id){
+        isCollapse: function (id) {
             var key = this.buildKey(id);
             return !$.isUndefined(this.collapseCache[key]);
         },
+        expandParent: function(id){
+            var key = this.buildKey(id), data = this.datas[key];
+            if(data && data.treeData){
+                var pid = data.treeData.pid || 0, pkey = this.buildKey(pid), pdata = this.datas[pkey];
+                if(pdata){
+                    var btnSwitch = doc.getElementById(this.buildSwitchId(pid));
+                    if(btnSwitch !== null && btnSwitch.getAttribute('expand') === '0'){
+                        this.expand(pid);
+                    }
+                    this.expandParent(pid);
+                }
+            }
+        },
         toggle: function (id, collapse) {
             var btnSwitch = doc.getElementById(this.buildSwitchId(id));
-            if(btnSwitch === null){
+            if (btnSwitch === null) {
                 return false;
             }
+            //判断收缩还是展开
             collapse = $.isBoolean(collapse, btnSwitch.getAttribute('expand') === '1');
-            /*
-            btnSwitch.setAttribute('expand', collapse ? 0 : 1);
-            btnSwitch.className = this.options.className[collapse ? 'collapse' : 'expand'];
-            //btnSwitch.innerHTML = collapse ? ' ++ ' : ' -- ';
-*/
             this.setSwitch(btnSwitch, collapse, false);
-           
+
+            //展开时，需要检查父级节点是否是展开状态，若为收缩则展开
+            if(!collapse){
+                this.expandParent(id);
+            }
+
             //获取当前节点下的所有子节点，展开和收缩 所获取到的子节点不一定相同，因为展开时需要屏蔽之前被收缩的子节点
             var childs = this.getChildIds(id), ids = this.getRowIds(childs, !collapse, []);
             //记录收缩状态
             this.setCollapse(id, ids, collapse);
 
-            for(var i = ids.length -1; i>=0; i--){
+            for (var i = ids.length - 1; i >= 0; i--) {
                 var obj = doc.getElementById(this.buildId(ids[i]));
-                if(obj !== null){
+                if (obj !== null) {
                     obj.style.display = collapse ? 'none' : '';
                 }
             }
@@ -542,36 +559,25 @@ var $ = $ || {};
             this.toggle(id, false);
         },
         toggleLevel: function (level, collapse) {
-            /*
-            var childs = [];
-            for(var i in this.datas){
-                var dr = this.datas[i].treeData;
-                if(dr && dr.level === level){
-                    childs.push(dr.id);
-                }
-            }
-
-            console.log('childs: ', childs);
-            var ids = this.getRowIds(childs, false, []);
-
-            console.log('ids: ', ids);
-            */
-            if(!$.isInteger(level)){
+            if (!$.isInteger(level)) {
                 return false;
             }
-            //层级展开时，收缩的层级+1
+            //按层级展开时，收缩的层级+1
             level += collapse ? 0 : 1;
 
-            for(var i in this.datas){
+            for (var i in this.datas) {
                 var dr = this.datas[i].treeData || {}, id = dr.id;
                 var obj = doc.getElementById(this.buildId(id)), btnSwitch = doc.getElementById(this.buildSwitchId(id));
-                if(obj !== null){
+                if (obj !== null) {
                     obj.style.display = dr.level <= level ? '' : 'none';
                 }
-                //只设置当前等级的图标状态
-                if(dr.level === level){
+                if (dr.level === level) {
+                    //设置当前等级的子级为收缩状态，记录收缩状态
                     this.setSwitch(btnSwitch, true, true);
                     this.setCollapse(id, [], true);
+                } else if (!collapse && dr.level < level) {
+                    //按层级展开时，设置当前等级为展开状态
+                    this.setSwitch(btnSwitch, false, true);
                 }
             }
         },

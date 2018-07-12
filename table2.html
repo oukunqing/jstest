@@ -92,12 +92,12 @@ ID:<input type="text" id="txtId" style="width:50px;" />
         
     var bodyData = [        
         {
-            rowData:{ attribute:{ id: 1, class:'tr-1'}, event:{click:function(){alert(this.id);}}}, treeData:{id:1, pid:0, level:0}, cellData:[
+            rowData:{ attribute:{ id: 1, class:'tr-1'}, event:{click:function(){alert(this.id);}}}, treeData:{id:1, pid:0}, cellData:[
                 {content:'单元格11', style:{color:'#f00'}}, {content:'单元格12'}, {content:'单元格13'}, {content:'单元格14'}, {content:'单元格15'}, {content:'单元格16'}
             ]
         },
         {
-            rowData: {}, treeData:{id:2, pid:1, level:'a'}, cellData:[
+            rowData: {}, treeData:{id:2, pid:1}, cellData:[
                 {content:'单元格21', style:'color:#00f;'}, {content:'单元格22'}, {content:'单元格23'}, {content:'单元格24'}, {content:'单元格25'}, {content:'单元格26'}
             ]
         }
@@ -130,47 +130,47 @@ ID:<input type="text" id="txtId" style="width:50px;" />
     window.setTimeout(function(){
         var bodyData = [
             {
-                rowData:{ attribute:{ id:1, class:'tr-1'}, event:{click:function(){alert(this.id);}}}, treeData:{id:1, pid:0, level:0}, cellData:[
+                rowData:{ attribute:{ id:1, class:'tr-1'}, event:{click:function(){alert(this.id);}}}, treeData:{id:1, pid:0}, cellData:[
                     {content:'单元格11', style:{color:'#f00'}}, {content:'单元格12'}, {content:'单元格13'}, {content:'单元格14'}, {content:'单元格15'}, {content:'单元格16'}
                 ]
             },
             {
-                rowData: {}, treeData:{id:2, pid:1, level:1}, cellData:[
+                rowData: {}, treeData:{id:2, pid:1}, cellData:[
                     {content:'单元格21', style:'color:#00f;'}, {content:'单元格22'}, {content:'单元格23'}, {content:'单元格24'}, {content:'单元格25'}, {content:'单元格26'}
                 ]
             },
             {
-                rowData: {}, treeData:{id:3, pid:1, level:1}, cellData:[
+                rowData: {}, treeData:{id:3, pid:1}, cellData:[
                     {content:'单元格31'}, {content:'单元格32'}, {content:'单元格33'}, {content:'单元格34'}, {content:'单元格35'}, {content:'单元格36'}
                 ]
             },
             {
-                rowData: {}, treeData:{id:4, pid:2, level:2}, cellData:[
+                rowData: {}, treeData:{id:4, pid:2}, cellData:[
                     {content:'单元格41'}, {content:'单元格42'}, {content:'单元格43'}, {content:'单元格44'}, {content:'单元格45'}, {content:'单元格46'}
                 ]
             },
             {
-                rowData: {}, treeData:{id:5, pid:2, level:2}, cellData:[
+                rowData: {}, treeData:{id:5, pid:2}, cellData:[
                     {content:'单元格51'}, {content:'单元格52'}, {content:'单元格53'}, {content:'单元格54'}, {content:'单元格55'}, {content:'单元格56'}
                 ]
             },
             {
-                rowData: {}, treeData:{id:6, pid:4, level:3}, cellData:[
+                rowData: {}, treeData:{id:6, pid:4}, cellData:[
                     {content:'单元格61'}, {content:'单元格62'}, {content:'单元格63'}, {content:'单元格64'}, {content:'单元格65'}, {content:'单元格66'}
                 ]
             },
             {
-                rowData: {}, treeData:{id:7, pid:2, level:2}, cellData:[
+                rowData: {}, treeData:{id:7, pid:2}, cellData:[
                     {content:'单元格71'}, {content:'单元格72'}, {content:'单元格73'}, {content:'单元格74'}, {content:'单元格75'}, {content:'单元格76'}
                 ]
             },
             {
-                rowData: {}, treeData:{id:8, pid:2, level:2}, cellData:[
+                rowData: {}, treeData:{id:8, pid:2}, cellData:[
                     {content:'单元格81'}, {content:'单元格82'}, {content:'单元格83'}, {content:'单元格84'}, {content:'单元格85'}, {content:'单元格86'}
                 ]
             },
             {
-                rowData: {}, treeData:{id:9, pid:3, level:2}, cellData:[
+                rowData: {}, treeData:{id:9, pid:3}, cellData:[
                     {content:'单元格91'}, {content:'单元格92'}, {content:'单元格93'}, {content:'单元格94'}, {content:'单元格95'}, {content:'单元格96'}
                 ]
             }
@@ -181,12 +181,12 @@ ID:<input type="text" id="txtId" style="width:50px;" />
     window.setTimeout(function(){
         var appendData = [
             {
-                rowData: {}, treeData:{id:18, pid:2, level:2}, cellData:[
+                rowData: {}, treeData:{id:18, pid:2}, cellData:[
                     {content:'单元格181'}, {content:'单元格182'}, {content:'单元格183'}, {content:'单元格184'}, {content:'单元格185'}, {content:'单元格186'}
                 ]
             },
             {
-                rowData: {}, treeData:{id:19, pid:3, level:2}, cellData:[
+                rowData: {}, treeData:{id:19, pid:3}, cellData:[
                     {content:'单元格191'}, {content:'单元格192'}, {content:'单元格193'}, {content:'单元格194'}, {content:'单元格195'}, {content:'单元格196'}
                 ]
             }
@@ -203,22 +203,22 @@ ID:<input type="text" id="txtId" style="width:50px;" />
     window.setTimeout(function(){
         var appendData = [
             {
-                rowData: {}, treeData:{id:28, pid:6, level:4}, cellData:[
+                rowData: {}, treeData:{id:28, pid:6}, cellData:[
                     {content:'单元格281'}, {content:'单元格282'}, {content:'单元格283'}, {content:'单元格284'}, {content:'单元格285'}, {content:'单元格286'}
                 ]
             },
             {
-                rowData: {}, treeData:{id:29, pid:4, level:3}, cellData:[
+                rowData: {}, treeData:{id:29, pid:4}, cellData:[
                     {content:'单元格291'}, {content:'单元格292'}, {content:'单元格293'}, {content:'单元格294'}, {content:'单元格295'}, {content:'单元格296'}
                 ]
             },
             {
-                rowData: {}, treeData:{id:30, pid:28, level:5}, cellData:[
+                rowData: {}, treeData:{id:30, pid:28}, cellData:[
                     {content:'单元格301'}, {content:'单元格302'}, {content:'单元格303'}, {content:'单元格304'}, {content:'单元格305'}, {content:'单元格306'}
                 ]
             },
             {
-                rowData: {}, treeData:{id:31, pid:40, level:5}, cellData:[
+                rowData: {}, treeData:{id:31, pid:40}, cellData:[
                     {content:'单元格311'}, {content:'单元格312'}, {content:'单元格313'}, {content:'单元格314'}, {content:'单元格315'}, {content:'单元格316'}
                 ]
             }
@@ -230,7 +230,7 @@ ID:<input type="text" id="txtId" style="width:50px;" />
     window.setTimeout(function(){
         var appendData = [
             {
-                rowData: {}, treeData:{id:32, pid:40, level:5}, cellData:[
+                rowData: {}, treeData:{id:32, pid:40}, cellData:[
                     {content:'单元格321'}, {content:'单元格322'}, {content:'单元格323'}, {content:'单元格324'}, {content:'单元格325'}, {content:'单元格326'}
                 ]
             }
@@ -242,17 +242,17 @@ ID:<input type="text" id="txtId" style="width:50px;" />
     window.setTimeout(function(){
         var appendData = [
             {
-                rowData: {}, treeData:{id:33, pid:41, level:5}, cellData:[
+                rowData: {}, treeData:{id:33, pid:41}, cellData:[
                     {content:'单元格331'}, {content:'单元格332'}, {content:'单元格333'}, {content:'单元格334'}, {content:'单元格335'}, {content:'单元格336'}
                 ]
             },
             {
-                rowData: {}, treeData:{id:34, pid:29, level:4}, cellData:[
+                rowData: {}, treeData:{id:34, pid:29}, cellData:[
                     {content:'单元格341'}, {content:'单元格342'}, {content:'单元格343'}, {content:'单元格344'}, {content:'单元格345'}, {content:'单元格346'}
                 ]
             },
             {
-                rowData: {}, treeData:{id:35, pid:7, level:5}, cellData:[
+                rowData: {}, treeData:{id:35, pid:7}, cellData:[
                     {content:'单元格351'}, {content:'单元格352'}, {content:'单元格353'}, {content:'单元格354'}, {content:'单元格355'}, {content:'单元格356'}
                 ]
             }
