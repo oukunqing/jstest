@@ -87,10 +87,7 @@ var $ = $ || {};
             }
         },
         getRowIndex = function (tr) {
-            if (tr !== null) {
-                return tr.rowIndex;
-            }
-            return -1;
+            return tr !== null ? tr.rowIndex : -1;
         },
         getTHeadRows = function (tb) {
             return $.isObject(tb) && tb.tagName === 'TABLE' && tb.tHead ? tb.tHead.rows.length : 0;
@@ -239,6 +236,7 @@ var $ = $ || {};
                 id = isTree ? treeData.id : '',
                 func = function (obj, action) {
                     //that.tree.toggle(this.getAttribute('tid'));
+                    //需要给相关的tr td 和 图标 设置 tid 属性
                     that.tree[action || 'toggle'](obj.getAttribute('tid'));
                     stopBubble();
                 }, 
@@ -255,6 +253,7 @@ var $ = $ || {};
                     row.setAttribute('id', that.tree.buildId(id));
                     //row.setAttribute('tree', '{{id:{id},pid:{pid},level:{level}}}'.format(treeData));
                     row.setAttribute('tree', '{id:' + treeData.id + ',pid:' + treeData.pid + ',level:' + treeData.level + '}');
+                    //设置tr创建记录，通过id找tr位置时要用到
                     that.tree.setMap(id, false);
                     content = that.tree.buildSwitch(id, treeData.level) + content;
                     //临时测试用
@@ -267,12 +266,10 @@ var $ = $ || {};
 
                     if (trigger.cell) {
                         cell.setAttribute('tid', id);
-                        //cell.style.cursor = 'default';
                         addListener(cell, trigger.cell[0], function () { func(this, trigger.cell[1] || 'toggle'); });
                     }
                     if (trigger.row) {
                         row.setAttribute('tid', id);
-                        //row.style.cursor = 'default';
                         addListener(row, trigger.row[0], function () { func(this, trigger.row[1] || 'toggle'); });
                     }
                 } else {
@@ -321,8 +318,7 @@ var $ = $ || {};
         findRowIndex: function (container, pid) {
             var childs = this.tree.getChildIds(pid), len = childs.length;
             var tr = doc.getElementById(this.tree.buildId(pid)), rowCount = 0, idx = -1;
-            var headRows = getTHeadRows(this.table);
-
+            var headRows = container.tagName === 'TBODY' ? getTHeadRows(this.table) : 0;
             if (len > 0 && tr != null) {
                 var id = 0, realPid = 0;
                 //找到父节点下的最后一个有效的直系子节点所在的行
@@ -358,6 +354,20 @@ var $ = $ || {};
                 }
             }
             return rowCount;
+        },
+        getRow: function(ids){
+            if($.isArray(ids)){
+                var list = [];
+                for(var i in ids){
+                    var tr = doc.getElementById(this.tree.buildId(ids[i]));
+                    if(tr != null){
+                        list.push(tr);
+                    }
+                }
+                return list;
+            } else {
+                return doc.getElementById(this.tree.buildId(id));
+            }
         }
     };
 
@@ -616,6 +626,32 @@ var $ = $ || {};
                     this.setSwitch(btnSwitch, false, true);
                 }
             }
+        },
+        collapseLevel: function(level){
+            this.toggleLevel(level, true);
+        },
+        expandLevel: function(level){
+            this.toggleLevel(level, false);
+        },
+        toggleAll: function(collapse){
+            for(var i in this.datas){
+                var dr = this.datas[i].treeData || {}, id = dr.id;
+                var obj = doc.getElementById(this.buildId(id)), btnSwitch = doc.getElementById(this.buildSwitchId(id));
+                if (obj !== null) {
+                    obj.style.display = collapse && dr.level > 0 ? 'none' : '';
+                }
+                //设置当前等级的子级为收缩状态，记录收缩状态
+                this.setSwitch(btnSwitch, collapse, false);
+                if(dr.level > 0){
+                    this.setCollapse(id, [], collapse);
+                }
+            }
+        },
+        collapseAll: function(){
+            this.toggleAll(true);
+        },
+        expandAll: function(){
+            this.toggleAll(false);
         },
         remove: function (id, keepSelf) {
             //获取当前节点下的所有子节点

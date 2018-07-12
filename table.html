@@ -69,6 +69,9 @@ ID:<input type="text" id="txtId" style="width:50px;" />
 <button onclick="toggle(false);">按ID展开</button>
 <button onclick="toggle(true);">按ID收缩</button>
 <button onclick="remove();">按ID删除</button>
+
+<button onclick="toggleAll(false);">全部展开</button>
+<button onclick="toggleAll(true);">全部收缩</button>
 <br /><br />
 
 <table id="tblist" class="tblist"></table>
@@ -277,6 +280,10 @@ ID:<input type="text" id="txtId" style="width:50px;" />
         if(!isNaN(level)){
             tb.tree.toggleLevel(level, collapse);
         }
+    }
+
+    function toggleAll(collapse){
+        tb.tree.toggleAll(collapse);
     }
 
     function remove(){
