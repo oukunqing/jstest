@@ -4,11 +4,58 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title></title>
     <style type="text/css">
-        body{font-size:12px;}
+        body{font-size:12px; font-family: Arial;}
         .tblist{border-collapse:collapse;}
         .tblist td{border:solid 1px #ccc; padding:5px;}
 
         .green{background:#008000;}
+
+        
+        .table-tree-expand{display:inline-block;
+            width:0;
+            height:0;
+            padding:0;
+            margin:0;
+            border-left:5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 6px solid #999;
+            margin-right:3px;
+        }
+        .table-tree-collapse{display:inline-block;
+            width:0;
+            height:0;
+            padding:0;
+            margin:0;
+            border-top: 5px solid transparent;
+            border-left: 6px solid #666;
+            border-bottom: 5px solid transparent; 
+            margin-right:3px;
+        }
+
+
+        
+        .expand{display:inline-block;
+            width:0;
+            height:0;
+            padding:0;
+            margin:0;
+            border-left:5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 6px solid #999;
+            margin-right:3px;
+            margin-left:0 !important;
+        }
+        .collapse{display:inline-block;
+            width:0;
+            height:0;
+            padding:0;
+            margin:0;
+            border-top: 5px solid transparent;
+            border-left: 6px solid #666;
+            border-bottom: 5px solid transparent; 
+            margin-right:3px;
+            margin-left:0 !important;
+        }
     </style>
     <script type="text/javascript" src="base.js"></script>
     <script type="text/javascript" src="table2.js"></script>
@@ -36,7 +83,7 @@
         
     var bodyData = [        
         {
-            rowData:{ attribute:{ /* id: 1, class:'tr-1'*/}, event:{click:function(){alert(this.id);}}}, treeData:{id:1, pid:0, level:0}, cellData:[
+            rowData:{ attribute:{ id: 1, class:'tr-1'}, event:{click:function(){alert(this.id);}}}, treeData:{id:1, pid:0, level:0}, cellData:[
                 {content:'单元格11', style:{color:'#f00'}}, {content:'单元格12'}, {content:'单元格13'}, {content:'单元格14'}, {content:'单元格15'}, {content:'单元格16'}
             ]
         },
@@ -47,14 +94,34 @@
         }
     ];
     
-    var tb = new $.table({table: 'tblist', headData:headData, showTree:true, treeCellIndex:0});
+    var tb = new $.table({
+        table: 'tblist',                //表格（对象 或 Id 或 null)，为null则自动创建表格对象（可以不设置）
+        parent: document.body,          //表格父节点，默认为 document.body （可以不设置）
+        headData: headData,             //初始化时要创建的表格头部数据（可以不设置），数据格式参考示例说明
+        bodyData: null,                 //初始化时要创建的表格主体数据（可以不设置），数据格式参考示例说明
+        showTree: true,                 //是否显示树形结构，boolean值： true | false, 默认为false（可以不设置）
+        treeCellIndex: 0,               //要显示树形结构的列索引，从0开始，默认为0（可以不设置）
+        trigger: {                      //树形收缩/展开触发器，若cell和row同时设置了不同的事件，可能会有事件冒泡
+            //cell: ['click', 'toggle'],  //点击列触发事件，数组或字符串，第1个元素为事件：(click, dblclick)，第2个元素为动作： (toggle, expand, collapse)
+            //row: 'click'                //点击行触发事件，数组或字符串，第1个元素为事件：(click, dblclick)，第2个元素为动作： (toggle, expand, collapse)
+        },
+        treeOptions:{                   //树形结构参数
+            spaceWidth: 16,             //树形每一层之间的缩进距离，单位为px，默认为16px（可以不设置）
+            /*className: {                //树形结构箭头图标样式
+                expand: 'expand',       //节点展开时的样式
+                collapse: 'collapse'    //节点收缩时的样式
+            },
+            */
+            className: ['expand', 'collapse'] //可以数组形式，第1个元素为节点展开的样式
+        } 
+    });
 
-        tb.createBody(bodyData);
+    tb.createBody(bodyData);
 
     window.setTimeout(function(){
         var bodyData = [
             {
-                rowData:{ attribute:{ /*id:1, class:'tr-1'*/}, event:{click:function(){alert(this.id);}}}, treeData:{id:1, pid:0, level:0}, cellData:[
+                rowData:{ attribute:{ id:1, class:'tr-1'}, event:{click:function(){alert(this.id);}}}, treeData:{id:1, pid:0, level:0}, cellData:[
                     {content:'单元格11', style:{color:'#f00'}}, {content:'单元格12'}, {content:'单元格13'}, {content:'单元格14'}, {content:'单元格15'}, {content:'单元格16'}
                 ]
             },
@@ -184,4 +251,7 @@
         tb.append(appendData);
     }, 3500);
 
+    window.setTimeout(function(){
+        tb.tree.collapse(6);
+    }, 5000);
 </script>
