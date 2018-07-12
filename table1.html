@@ -4,16 +4,73 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title></title>
     <style type="text/css">
-        body{font-size:12px;}
+        body{font-size:12px; font-family: Arial;}
         .tblist{border-collapse:collapse;}
         .tblist td{border:solid 1px #ccc; padding:5px;}
 
         .green{background:#008000;}
+
+        /*
+        .table-tree-expand{display:inline-block;
+            width:0;
+            height:0;
+            padding:0;
+            margin:0;
+            border-left:5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 6px solid #999;
+            margin-right:3px;
+        }
+        .table-tree-collapse{display:inline-block;
+            width:0;
+            height:0;
+            padding:0;
+            margin:0;
+            border-top: 5px solid transparent;
+            border-left: 6px solid #666;
+            border-bottom: 5px solid transparent; 
+            margin-right:3px;
+        }
+
+
+        
+        .expand{display:inline-block;
+            width:0;
+            height:0;
+            padding:0;
+            margin:0;
+            border-left:5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 6px solid #999;
+            margin-right:3px;
+            margin-left:0 !important;
+        }
+        .collapse{display:inline-block;
+            width:0;
+            height:0;
+            padding:0;
+            margin:0;
+            border-top: 5px solid transparent;
+            border-left: 6px solid #666;
+            border-bottom: 5px solid transparent; 
+            margin-right:3px;
+            margin-left:0 !important;
+        }
+        */
     </style>
     <script type="text/javascript" src="base.js"></script>
-    <script type="text/javascript" src="table1.js"></script>
+    <script type="text/javascript" src="table.js"></script>
 </head>
 <body>
+层级：<input type="text" id="txtLevel" style="width:50px;" />
+<button onclick="toggleLevel(false);">按层级展开</button>
+<button onclick="toggleLevel(true);">按层级收缩</button>
+ID:<input type="text" id="txtId" style="width:50px;" />
+<button onclick="toggle(false);">按ID展开</button>
+<button onclick="toggle(true);">按ID收缩</button>
+<button onclick="remove();">按ID删除</button>
+<br /><br />
+
 <table id="tblist" class="tblist"></table>
 <br />
 <table id="tblist1" class="tblist"></table>
@@ -21,70 +78,413 @@
 </html>
 <script type="text/javascript">
     var headData = [
-        {rowData:{}, cellData: [{ content: '表头11', style: { background: '#f00', textAlign: 'center' } }, { content: '表头12', style: {} }, { content: '表头13', style: {} }]
+        {
+            rowData:{
+                style:{background:'#005eac'}
+            }, cellData: ['表头11', '表头12', '表头13', '表头14', '表头15', '表头16']
         },
-        {rowData:{}, cellData: [{ content: '表头21', style: {}, event: { click: function () { alert(this.innerHTML); } } }, { content: '表头22', style: {} }, { content: '表头23', style: {} }]
-        }
+        {
+            rowData:{
+                style:{background:'#005eac'}
+            }, cellData: ['表头21', '表头22', '表头23', '表头24', '表头25', '表头26']
+        },
+        ['表头31', '表头33', '表头33', '表头34', '表头35', '表头36']
     ];
-    
-    var bodyData1 = [
-        ['单元格41', '单元格42', '单元格43', '单元格44'],
-        ['单元格51', '单元格52', '单元格53'],
-        ['单元格61', '单元格62', '单元格63']
-    ];
-    var bodyData2 = ['单元格71','单元格72','单元格73','单元格74','单元格75'];
-    
+        
     var bodyData = [
-        {
-            rowData:{attribute:{id:1},event:{click:function(){alert(this.id);}}}, treeData:{id:1, pid:0, level:0}, cellData:[
-                {content:'单元格11'}, {content:'单元格12'}, {content:'单元格13'}, {content:'单元格14'}, {content:'单元格15'}, {content:'单元格16'}
-            ]
-        },        
-        {
-            rowData: {}, treeData:{id:2, pid:1, level:1}, cellData:[
-                {content:'单元格21'}, {content:'单元格22'}, {content:'单元格23'}, {content:'单元格24'}, {content:'单元格25'}, {content:'单元格26'}
-            ]
-        },
-        {
-            rowData: {}, treeData:{id:3, pid:1, level:1}, cellData:[
-                {content:'单元格31'}, {content:'单元格32'}, {content:'单元格33'}, {content:'单元格34'}, {content:'单元格35'}, {content:'单元格36'}
-            ]
-        },
-        {
-            rowData: {}, treeData:{id:4, pid:2, level:2}, cellData:[
-                {content:'单元格41'}, {content:'单元格42'}, {content:'单元格43'}, {content:'单元格44'}, {content:'单元格45'}, {content:'单元格46'}
-            ]
-        },
-        {
-            rowData: {}, treeData:{id:5, pid:2, level:2}, cellData:[
-                {content:'单元格51'}, {content:'单元格52'}, {content:'单元格53'}, {content:'单元格54'}, {content:'单元格55'}, {content:'单元格56'}
-            ]
-        },
-        {
-            rowData: {}, treeData:{id:6, pid:4, level:3}, cellData:[
-                {content:'单元格61'}, {content:'单元格62'}, {content:'单元格63'}, {content:'单元格64'}, {content:'单元格65'}, {content:'单元格66'}
-            ]
-        },
-        {
-            rowData: {}, treeData:{id:7, pid:2, level:2}, cellData:[
-                {content:'单元格71'}, {content:'单元格72'}, {content:'单元格73'}, {content:'单元格74'}, {content:'单元格75'}, {content:'单元格76'}
-            ]
-        }
+        { treeData: { id: 1, pid: 0 }, cellData: ["主控制中心", "1"] },
+        { treeData: { id: 2, pid: 1 }, cellData: ["中研瑞华", "1312180931129841"] },
+        { treeData: { id: 6, pid: 1 }, cellData: ["宁夏", "1403190944568453"] },
+        { treeData: { id: 9, pid: 1 }, cellData: ["浙江", "1403250841193485"] },
+        { treeData: { id: 22, pid: 1 }, cellData: ["广东", "1406211352491842"] },
+        { treeData: { id: 24, pid: 1 }, cellData: ["江西", "1406211659542614"] },
+        { treeData: { id: 35, pid: 1 }, cellData: ["河北", "1406301553236980"] },
+        { treeData: { id: 75, pid: 1 }, cellData: ["河南", "1409060907324317"] },
+        { treeData: { id: 76, pid: 1 }, cellData: ["山东", "1409061051311631"] },
+        { treeData: { id: 87, pid: 1 }, cellData: ["安徽", "1410300838252848"] },
+        { treeData: { id: 97, pid: 1 }, cellData: ["福建", "1412020925429514"] },
+        { treeData: { id: 100, pid: 1 }, cellData: ["湖南", "1412111401094681"] },
+        { treeData: { id: 131, pid: 1 }, cellData: ["四川", "1501271654574791"] },
+        { treeData: { id: 152, pid: 1 }, cellData: ["广西", "1503191706226863"] },
+        { treeData: { id: 164, pid: 1 }, cellData: ["湖北", "1504251716473194"] },
+        { treeData: { id: 181, pid: 1 }, cellData: ["江苏", "1506091355044816"] },
+        { treeData: { id: 190, pid: 1 }, cellData: ["山西", "1506301809417896"] },
+        { treeData: { id: 290, pid: 1 }, cellData: ["上海", "1608100853111429"] },
+        { treeData: { id: 326, pid: 1 }, cellData: ["815散客", "1612281729056674"] },
+        { treeData: { id: 400, pid: 1 }, cellData: ["云南", "1803311305178462"] },
+        { treeData: { id: 412, pid: 1 }, cellData: ["重庆", "1805151709340859"] },
+        { treeData: { id: 416, pid: 1 }, cellData: ["陕西", "1805171641467624"] },
+        { treeData: { id: 5, pid: 2 }, cellData: ["WMP测试", "1402252136285038"] },
+        { treeData: { id: 7, pid: 6 }, cellData: ["银川峰兴达科贸有限公司", "1403190946189644"] },
+        { treeData: { id: 15, pid: 2 }, cellData: ["国土演示", "1404211512315406"] },
+        { treeData: { id: 56, pid: 9 }, cellData: ["温州亚奈", "1407081423313668"] },
+        { treeData: { id: 66, pid: 35 }, cellData: ["中研广汇", "1407281318087923"] },
+        { treeData: { id: 73, pid: 2 }, cellData: ["客户测试", "1408181640144742"] },
+        { treeData: { id: 74, pid: 2 }, cellData: ["116测试", "1409012126289933"] },
+        { treeData: { id: 77, pid: 76 }, cellData: ["日照振东", "1409061051382291"] },
+        { treeData: { id: 78, pid: 2 }, cellData: ["310测试", "1409061508039908"] },
+        { treeData: { id: 79, pid: 2 }, cellData: ["对接研发测试", "1409160948025884"] },
+        { treeData: { id: 83, pid: 9 }, cellData: ["杭州华进", "1410081657209236"] },
+        { treeData: { id: 85, pid: 9 }, cellData: ["咸亨国际科研中心", "1410111414514605"] },
+        { treeData: { id: 86, pid: 9 }, cellData: ["余姚城管", "1410131700568264"] },
+        { treeData: { id: 88, pid: 87 }, cellData: ["马鞍山水利局", "1410300838349251"] },
+        { treeData: { id: 103, pid: 2 }, cellData: ["101测试", "1412201502131825"] },
+        { treeData: { id: 104, pid: 35 }, cellData: ["瀚思科技", "1412261722588901"] },
+        { treeData: { id: 106, pid: 2 }, cellData: ["A-815测试", "1412301752465472"] },
+        { treeData: { id: 109, pid: 22 }, cellData: ["中山神剑", "1501061036011084"] },
+        { treeData: { id: 128, pid: 9 }, cellData: ["衢州", "1501080826518665"] },
+        { treeData: { id: 136, pid: 76 }, cellData: ["青岛鸿升沃达", "1501311359529002"] },
+        { treeData: { id: 140, pid: 97 }, cellData: ["福建四创", "1501311444103493"] },
+        { treeData: { id: 150, pid: 76 }, cellData: ["青岛亿信联盟", "1503141645480661"] },
+        { treeData: { id: 157, pid: 35 }, cellData: ["姚然", "1504071252115148"] },
+        { treeData: { id: 165, pid: 164 }, cellData: ["奋进电力", "1504251719591529"] },
+        { treeData: { id: 167, pid: 87 }, cellData: ["联圣电气", "1504300829403973"] },
+        { treeData: { id: 168, pid: 2 }, cellData: ["演示", "1504301026490056"] },
+        { treeData: { id: 170, pid: 9 }, cellData: ["艮威水利", "1505171444346044"] },
+        { treeData: { id: 174, pid: 131 }, cellData: ["朗天通信", "1505231036474125"] },
+        { treeData: { id: 182, pid: 181 }, cellData: ["华创", "1506091355262283"] },
+        { treeData: { id: 183, pid: 9 }, cellData: ["云和水利局", "1506101036296203"] },
+        { treeData: { id: 184, pid: 9 }, cellData: ["遂昌水利局", "1506101037340472"] },
+        { treeData: { id: 186, pid: 97 }, cellData: ["和盛高科", "1506241553158370"] },
+        { treeData: { id: 204, pid: 9 }, cellData: ["长兴县水利局", "1508131604269589"] },
+        { treeData: { id: 206, pid: 76 }, cellData: ["莒县人民法院", "1508290938259521"] },
+        { treeData: { id: 207, pid: 97 }, cellData: ["亿鑫海", "1509231647217217"] },
+        { treeData: { id: 208, pid: 9 }, cellData: ["丽水水利局", "1509241642162295"] },
+        { treeData: { id: 212, pid: 2 }, cellData: ["710测试", "1510171325182007"] },
+        { treeData: { id: 215, pid: 9 }, cellData: ["省水利水电勘测设计院", "1510281657304734"] },
+        { treeData: { id: 218, pid: 97 }, cellData: ["福建特检院", "1511121019538821"] },
+        { treeData: { id: 220, pid: 35 }, cellData: ["唐海气象局", "1511131605532705"] },
+        { treeData: { id: 224, pid: 87 }, cellData: ["弘帆物流", "1512241258357264"] },
+        { treeData: { id: 233, pid: 2 }, cellData: ["815临时", "1601251545500201"] },
+        { treeData: { id: 234, pid: 181 }, cellData: ["安客讯", "1602031222279379"] },
+        { treeData: { id: 237, pid: 9 }, cellData: ["德钦县水务局", "1603111252218359"] },
+        { treeData: { id: 238, pid: 9 }, cellData: ["咸亨物联网中心", "1603111425273783"] },
+        { treeData: { id: 246, pid: 9 }, cellData: ["余姚GPS", "1604280841481932"] },
+        { treeData: { id: 259, pid: 9 }, cellData: ["奉化水利局", "1605171420422956"] },
+        { treeData: { id: 262, pid: 131 }, cellData: ["美兰机场", "1605181235203090"] },
+        { treeData: { id: 264, pid: 181 }, cellData: ["京华", "1606021446324100"] },
+        { treeData: { id: 267, pid: 22 }, cellData: ["龙音电子", "1606181038310746"] },
+        { treeData: { id: 271, pid: 131 }, cellData: ["达州", "1606251625266182"] },
+        { treeData: { id: 288, pid: 2 }, cellData: ["720测试", "1607231033451830"] },
+        { treeData: { id: 291, pid: 290 }, cellData: ["威斯莱克", "1608100854051035"] },
+        { treeData: { id: 293, pid: 9 }, cellData: ["亚驰房车", "1608201723548430"] },
+        { treeData: { id: 296, pid: 76 }, cellData: ["青岛九瑞汽车", "1609070938119079"] },
+        { treeData: { id: 300, pid: 35 }, cellData: ["宣化区指挥中心", "1609291100480051"] },
+        { treeData: { id: 301, pid: 35 }, cellData: ["张家口", "1609291548087276"] },
+        { treeData: { id: 302, pid: 9 }, cellData: ["宁波气象局", "1610131354101395"] },
+        { treeData: { id: 312, pid: 75 }, cellData: ["郑州热力总公司", "1611232203382973"] },
+        { treeData: { id: 313, pid: 181 }, cellData: ["龙信建设集团", "1611300939287987"] },
+        { treeData: { id: 322, pid: 9 }, cellData: ["余大千", "1612261537349257"] },
+        { treeData: { id: 327, pid: 326 }, cellData: ["客户", "1612281729306425"] },
+        { treeData: { id: 328, pid: 2 }, cellData: ["探鱼研究", "1701190958166765"] },
+        { treeData: { id: 330, pid: 9 }, cellData: ["雁荡山楼村", "1702160901440245"] },
+        { treeData: { id: 332, pid: 75 }, cellData: ["郑煤集团", "1703111027580974"] },
+        { treeData: { id: 337, pid: 2 }, cellData: ["故障排查", "1704281402148470"] },
+        { treeData: { id: 338, pid: 2 }, cellData: ["安卓测试", "1705091417081655"] },
+        { treeData: { id: 340, pid: 87 }, cellData: ["金禾软件", "1706051552351787"] },
+        { treeData: { id: 341, pid: 76 }, cellData: ["青岛测试", "1706051657012390"] },
+        { treeData: { id: 343, pid: 2 }, cellData: ["810测试", "3740100"] },
+        { treeData: { id: 349, pid: 181 }, cellData: ["常州市质量技术监督局", "1706271049179233"] },
+        { treeData: { id: 350, pid: 100 }, cellData: ["湖南职教", "1706271304023869"] },
+        { treeData: { id: 353, pid: 181 }, cellData: ["南通五健", "1707100831343111"] },
+        { treeData: { id: 380, pid: 2 }, cellData: ["软件评测", "1711010815536244"] },
+        { treeData: { id: 386, pid: 2 }, cellData: ["28181", "1711291034599202"] },
+        { treeData: { id: 390, pid: 2 }, cellData: ["255测试", "1712251107003838"] },
+        { treeData: { id: 393, pid: 2 }, cellData: ["4G变焦单兵", "1801111349421251"] },
+        { treeData: { id: 394, pid: 164 }, cellData: ["世纪航信", "1801121541292366"] },
+        { treeData: { id: 395, pid: 2 }, cellData: ["轨道车测试", "1802021110075486"] },
+        { treeData: { id: 397, pid: 22 }, cellData: ["深圳", "1803131558356252"] },
+        { treeData: { id: 399, pid: 2 }, cellData: ["711测试", "1803300804227090"] },
+        { treeData: { id: 401, pid: 400 }, cellData: ["火星人", "1803311305452191"] },
+        { treeData: { id: 404, pid: 2 }, cellData: ["巡检设备", "1804251342462453"] },
+        { treeData: { id: 405, pid: 9 }, cellData: ["象山气象屏", "1804260938313148"] },
+        { treeData: { id: 406, pid: 152 }, cellData: ["嘉禾通达", "1804261306582127"] },
+        { treeData: { id: 408, pid: 76 }, cellData: ["青岛悦峰", "1805030958272885"] },
+        { treeData: { id: 411, pid: 290 }, cellData: ["新海丰物流", "1805101611088401"] },
+        { treeData: { id: 413, pid: 412 }, cellData: ["郫县水务", "1805151710013004"] },
+        { treeData: { id: 417, pid: 416 }, cellData: ["军盾", "1805171642028983"] },
+        { treeData: { id: 419, pid: 152 }, cellData: ["柳州机场", "1805181520548399"] },
+        { treeData: { id: 423, pid: 9 }, cellData: ["北仑安监局", "1805231249457465"] },
+        { treeData: { id: 424, pid: 76 }, cellData: ["智能安防机器人", "1805231607305294"] },
+        { treeData: { id: 425, pid: 9 }, cellData: ["东钱湖LED", "1805251437229305"] },
+        { treeData: { id: 8, pid: 7 }, cellData: ["盐池县长盛工贸有限公司", "1403190946290424"] },
+        { treeData: { id: 92, pid: 77 }, cellData: ["613避险车道", "1411171519098932"] },
+        { treeData: { id: 98, pid: 83 }, cellData: ["舟山公安局", "1412031553539498"] },
+        { treeData: { id: 105, pid: 104 }, cellData: ["定点监控", "1412261724036775"] },
+        { treeData: { id: 110, pid: 109 }, cellData: ["神剑1", "1501061036383613"] },
+        { treeData: { id: 129, pid: 83 }, cellData: ["普陀山", "1501081224083159"] },
+        { treeData: { id: 130, pid: 83 }, cellData: ["绍兴禁毒", "1501210935345725"] },
+        { treeData: { id: 133, pid: 85 }, cellData: ["电莞电力", "1501271953232633"] },
+        { treeData: { id: 137, pid: 136 }, cellData: ["甘肃省环境应急与事故调查中心", "1501311402092131"] },
+        { treeData: { id: 138, pid: 136 }, cellData: ["客户b", "1501311438215795"] },
+        { treeData: { id: 139, pid: 136 }, cellData: ["客户C", "1501311442033963"] },
+        { treeData: { id: 142, pid: 136 }, cellData: ["检测站", "1502051242407240"] },
+        { treeData: { id: 146, pid: 83 }, cellData: ["嘉兴国宝", "1503111019176030"] },
+        { treeData: { id: 151, pid: 150 }, cellData: ["建筑", "1503141646126688"] },
+        { treeData: { id: 163, pid: 83 }, cellData: ["吴兴禁毒", "1504231417203456"] },
+        { treeData: { id: 166, pid: 165 }, cellData: ["奋进测试", "1504251720270761"] },
+        { treeData: { id: 169, pid: 77 }, cellData: ["车载", "1505041626441813"] },
+        { treeData: { id: 171, pid: 104 }, cellData: ["遵义", "1505181620139569"] },
+        { treeData: { id: 172, pid: 140 }, cellData: ["安顺水利局", "1505191348281499"] },
+        { treeData: { id: 175, pid: 174 }, cellData: ["应急指挥", "1505231037109218"] },
+        { treeData: { id: 185, pid: 77 }, cellData: ["铁路桥", "1506221137279753"] },
+        { treeData: { id: 196, pid: 140 }, cellData: ["保山水利局", "1508030909116817"] },
+        { treeData: { id: 205, pid: 83 }, cellData: ["4G测试球机", "1508251311032564"] },
+        { treeData: { id: 210, pid: 83 }, cellData: ["温岭城北派出所", "1510120902210120"] },
+        { treeData: { id: 213, pid: 83 }, cellData: ["杭州海关", "1510191111472162"] },
+        { treeData: { id: 214, pid: 77 }, cellData: ["迎宾大桥", "1510260909225612"] },
+        { treeData: { id: 216, pid: 215 }, cellData: ["桐卢县水利水电局", "1510281658086150"] },
+        { treeData: { id: 222, pid: 83 }, cellData: ["测试", "1512111705206865"] },
+        { treeData: { id: 225, pid: 224 }, cellData: ["弘帆船队", "1512241302117247"] },
+        { treeData: { id: 226, pid: 224 }, cellData: ["南京基地", "1512241302430804"] },
+        { treeData: { id: 227, pid: 224 }, cellData: ["芜湖基地", "1512241302552483"] },
+        { treeData: { id: 231, pid: 83 }, cellData: ["绍兴技侦", "1601081136162990"] },
+        { treeData: { id: 235, pid: 234 }, cellData: ["akx01", "1602031223322870"] },
+        { treeData: { id: 236, pid: 56 }, cellData: ["客户1", "1602171509290329"] },
+        { treeData: { id: 239, pid: 238 }, cellData: ["张家界机场", "1603111426104656"] },
+        { treeData: { id: 240, pid: 234 }, cellData: ["akx02", "1603121618398206"] },
+        { treeData: { id: 241, pid: 109 }, cellData: ["TONY", "1604071336025178"] },
+        { treeData: { id: 243, pid: 83 }, cellData: ["12345", "1604211441519524"] },
+        { treeData: { id: 257, pid: 83 }, cellData: ["4G云台", "1605101531237254"] },
+        { treeData: { id: 263, pid: 262 }, cellData: ["机场", "1605181236034119"] },
+        { treeData: { id: 268, pid: 267 }, cellData: ["龙音客户A", "1606181038507145"] },
+        { treeData: { id: 269, pid: 83 }, cellData: ["后备箱", "1606201445470056"] },
+        { treeData: { id: 270, pid: 234 }, cellData: ["上海厉基", "1606241833000694"] },
+        { treeData: { id: 273, pid: 234 }, cellData: ["akx03", "1607011422037111"] },
+        { treeData: { id: 274, pid: 83 }, cellData: ["南浔公安分局", "1607060935522643"] },
+        { treeData: { id: 275, pid: 83 }, cellData: ["西湖公安", "1607111214084117"] },
+        { treeData: { id: 276, pid: 83 }, cellData: ["公安", "1607111227223128"] },
+        { treeData: { id: 277, pid: 83 }, cellData: ["公安1", "1607111246303034"] },
+        { treeData: { id: 278, pid: 83 }, cellData: ["ga2", "1607111256492492"] },
+        { treeData: { id: 279, pid: 83 }, cellData: ["ga3", "1607120949025266"] },
+        { treeData: { id: 280, pid: 83 }, cellData: ["ga4", "1607121011364754"] },
+        { treeData: { id: 281, pid: 83 }, cellData: ["浙江大学", "1607121616571322"] },
+        { treeData: { id: 282, pid: 83 }, cellData: ["ga5", "1607130910296613"] },
+        { treeData: { id: 283, pid: 83 }, cellData: ["ga6", "1607131033188748"] },
+        { treeData: { id: 284, pid: 83 }, cellData: ["nanxun002", "1607141311510362"] },
+        { treeData: { id: 287, pid: 83 }, cellData: ["西湖巡特警", "1607201520395288"] },
+        { treeData: { id: 289, pid: 83 }, cellData: ["华进测试", "1607292314444937"] },
+        { treeData: { id: 298, pid: 165 }, cellData: ["客户A", "1609231724345830"] },
+        { treeData: { id: 304, pid: 56 }, cellData: ["客户2", "1610210846353359"] },
+        { treeData: { id: 314, pid: 56 }, cellData: ["客户3", "1612050925213948"] },
+        { treeData: { id: 317, pid: 296 }, cellData: ["前景光电", "1612061441375623"] },
+        { treeData: { id: 318, pid: 296 }, cellData: ["手持2", "1612061441595736"] },
+        { treeData: { id: 319, pid: 296 }, cellData: ["手持3", "1612061442102282"] },
+        { treeData: { id: 323, pid: 322 }, cellData: ["A客户", "1612261537519947"] },
+        { treeData: { id: 329, pid: 234 }, cellData: ["akx05", "1702151325027241"] },
+        { treeData: { id: 331, pid: 85 }, cellData: ["黄花机场", "1702211442224347"] },
+        { treeData: { id: 335, pid: 140 }, cellData: ["茶陵县", "1704240942042628"] },
+        { treeData: { id: 336, pid: 83 }, cellData: ["ga10", "1704251310307291"] },
+        { treeData: { id: 339, pid: 83 }, cellData: ["JDGA", "1705161344458818"] },
+        { treeData: { id: 366, pid: 296 }, cellData: ["长热集团", "1709271601181961"] },
+        { treeData: { id: 369, pid: 302 }, cellData: ["2017年9套监控", "1709291355042177"] },
+        { treeData: { id: 370, pid: 165 }, cellData: ["宁夏2017", "1710161559342979"] },
+        { treeData: { id: 371, pid: 165 }, cellData: ["客户B", "1710161639390261"] },
+        { treeData: { id: 373, pid: 165 }, cellData: ["银川", "1710191119112282"] },
+        { treeData: { id: 378, pid: 66 }, cellData: ["定位设备", "1710271033221015"] },
+        { treeData: { id: 383, pid: 83 }, cellData: ["演示", "1711251338075836"] },
+        { treeData: { id: 384, pid: 83 }, cellData: ["车载云台", "1711271631338134"] },
+        { treeData: { id: 385, pid: 83 }, cellData: ["海康球机", "1711271632106924"] },
+        { treeData: { id: 387, pid: 136 }, cellData: ["应急救援", "1712061723125892"] },
+        { treeData: { id: 388, pid: 288 }, cellData: ["设备默认配置", "1712131027448761"] },
+        { treeData: { id: 389, pid: 302 }, cellData: ["2017年球机", "1712201844192890"] },
+        { treeData: { id: 396, pid: 83 }, cellData: ["洞头刑侦", "1803081652424239"] },
+        { treeData: { id: 403, pid: 165 }, cellData: ["福建电力公司", "1804081434181126"] },
+        { treeData: { id: 407, pid: 406 }, cellData: ["消防大队", "1804261307389731"] },
+        { treeData: { id: 420, pid: 140 }, cellData: ["沧源水利局", "1805191555031578"] },
+        { treeData: { id: 422, pid: 140 }, cellData: ["黄浦水利局", "1805221521397145"] },
+        { treeData: { id: 426, pid: 296 }, cellData: ["奔驰指挥车", "1806051300475288"] },
+        { treeData: { id: 427, pid: 296 }, cellData: ["演示", "1806201415365186"] },
+        { treeData: { id: 197, pid: 196 }, cellData: ["腾冲县", "1508030909316341"] },
+        { treeData: { id: 199, pid: 196 }, cellData: ["龙陵县", "1508031018578708"] },
+        { treeData: { id: 200, pid: 196 }, cellData: ["隆阳区", "1508031020001776"] },
+        { treeData: { id: 201, pid: 196 }, cellData: ["昌宁县", "1508031020144041"] },
+        { treeData: { id: 255, pid: 139 }, cellData: ["客户E", "1605061517150992"] },
+        { treeData: { id: 258, pid: 196 }, cellData: ["施甸县", "1605131052325992"] },
+        { treeData: { id: 295, pid: 235 }, cellData: ["whjd", "1609011620376990"] },
+        { treeData: { id: 334, pid: 172 }, cellData: ["普定县", "1704201422469145"] },
+        { treeData: { id: 382, pid: 196 }, cellData: ["保山球机", "1711180930505247"] }
     ];
-    var tb = new $.table(document.getElementById('tblist'), {head:headData, body:bodyData}, {showTree:true, treeRowIndex:1});
-
-    var appendData = [
-        {
-            rowData: {}, treeData:{id:8, pid:2, level:2}, cellData:[
-                {content:'单元格81'}, {content:'单元格82'}, {content:'单元格83'}, {content:'单元格84'}, {content:'单元格85'}, {content:'单元格86'}
-            ]
+        
+    var tb = new $.table({
+        table: 'tblist',                //表格（对象 或 Id 或 null)，为null则自动创建表格对象（可以不设置）
+        parent: document.body,          //表格父节点，默认为 document.body （可以不设置）
+        headData: headData,             //初始化时要创建的表格头部数据（可以不设置），数据格式参考示例说明
+        bodyData: null,                 //初始化时要创建的表格主体数据（可以不设置），数据格式参考示例说明
+        showTree: true,                 //是否显示树形结构，boolean值： true | false, 默认为false（可以不设置）
+        treeCellIndex: 0,               //要显示树形结构的列索引，从0开始，默认为0（可以不设置）
+        trigger: {                      //树形收缩/展开触发器，若cell和row同时设置了不同的事件，可能会有事件冒泡
+            cell: ['click', 'toggle'],  //点击列触发事件，数组或字符串，第1个元素为事件：(click, dblclick)，第2个元素为动作： (toggle, expand, collapse)
+            //row: 'click'                //点击行触发事件，数组或字符串，第1个元素为事件：(click, dblclick)，第2个元素为动作： (toggle, expand, collapse)
         },
-        {
-            rowData: {}, treeData:{id:9, pid:3, level:2}, cellData:[
-                {content:'单元格91'}, {content:'单元格92'}, {content:'单元格93'}, {content:'单元格94'}, {content:'单元格95'}, {content:'单元格96'}
-            ]
-        }
-    ];
+        treeOptions:{                   //树形结构参数
+            spaceWidth: 16,             //树形每一层之间的缩进距离，单位为px，默认为16px（可以不设置）
+            /*className: {                //树形结构箭头图标样式
+                expand: 'expand',       //节点展开时的样式
+                collapse: 'collapse'    //节点收缩时的样式
+            },
+            */
+            //className: ['expand', 'collapse'] //可以数组形式，第1个元素为节点展开的样式
+        } 
+    });
 
-    tb.append(appendData);
+    tb.createBody(bodyData);
+/*
+    window.setTimeout(function(){
+        var bodyData = [
+            {
+                rowData:{ attribute:{ id:1, class:'tr-1'}, event:{click:function(){alert(this.id);}}}, treeData:{id:1, pid:0}, cellData:[
+                    {content:'单元格11', style:{color:'#f00'}}, {content:'单元格12'}, {content:'单元格13'}, {content:'单元格14'}, {content:'单元格15'}, {content:'单元格16'}
+                ]
+            },
+            {
+                rowData: {}, treeData:{id:2, pid:1}, cellData:[
+                    {content:'单元格21', style:'color:#00f;'}, {content:'单元格22'}, {content:'单元格23'}, {content:'单元格24'}, {content:'单元格25'}, {content:'单元格26'}
+                ]
+            },
+            {
+                rowData: {}, treeData:{id:4, pid:2}, cellData:[
+                    {content:'单元格41'}, {content:'单元格42'}, {content:'单元格43'}, {content:'单元格44'}, {content:'单元格45'}, {content:'单元格46'}
+                ]
+            },
+            {
+                rowData: {}, treeData:{id:3, pid:1}, cellData:[
+                    {content:'单元格31'}, {content:'单元格32'}, {content:'单元格33'}, {content:'单元格34'}, {content:'单元格35'}, {content:'单元格36'}
+                ]
+            },
+            {
+                rowData: {}, treeData:{id:5, pid:2}, cellData:[
+                    {content:'单元格51'}, {content:'单元格52'}, {content:'单元格53'}, {content:'单元格54'}, {content:'单元格55'}, {content:'单元格56'}
+                ]
+            },
+            {
+                rowData: {}, treeData:{id:6, pid:4}, cellData:[
+                    {content:'单元格61'}, {content:'单元格62'}, {content:'单元格63'}, {content:'单元格64'}, {content:'单元格65'}, {content:'单元格66'}
+                ]
+            },
+            {
+                rowData: {}, treeData:{id:7, pid:2}, cellData:[
+                    {content:'单元格71'}, {content:'单元格72'}, {content:'单元格73'}, {content:'单元格74'}, {content:'单元格75'}, {content:'单元格76'}
+                ]
+            },
+            {
+                rowData: {}, treeData:{id:8, pid:2}, cellData:[
+                    {content:'单元格81'}, {content:'单元格82'}, {content:'单元格83'}, {content:'单元格84'}, {content:'单元格85'}, {content:'单元格86'}
+                ]
+            },
+            {
+                rowData: {}, treeData:{id:9, pid:3}, cellData:[
+                    {content:'单元格91'}, {content:'单元格92'}, {content:'单元格93'}, {content:'单元格94'}, {content:'单元格95'}, {content:'单元格96'}
+                ]
+            }
+        ];
+        tb.append(bodyData);
+    }, 1000);
+
+    window.setTimeout(function(){
+        var appendData = [
+            {
+                rowData: {}, treeData:{id:18, pid:2}, cellData:[
+                    {content:'单元格181'}, {content:'单元格182'}, {content:'单元格183'}, {content:'单元格184'}, {content:'单元格185'}, {content:'单元格186'}
+                ]
+            },
+            {
+                rowData: {}, treeData:{id:19, pid:3}, cellData:[
+                    {content:'单元格191'}, {content:'单元格192'}, {content:'单元格193'}, {content:'单元格194'}, {content:'单元格195'}, {content:'单元格196'}
+                ]
+            }
+        ];
+        tb.createBody(appendData);
+    }, 1500);
+
+
+    window.setTimeout(function(){
+        var appendData =  ['单元格101', '单元格103', '单元格103', '单元格104', '单元格105', '单元格106'];
+        tb.append(appendData);
+    }, 2000);
+
+    window.setTimeout(function(){
+        var appendData = [
+            {
+                rowData: {}, treeData:{id:28, pid:6}, cellData:[
+                    {content:'单元格281'}, {content:'单元格282'}, {content:'单元格283'}, {content:'单元格284'}, {content:'单元格285'}, {content:'单元格286'}
+                ]
+            },
+            {
+                rowData: {}, treeData:{id:29, pid:4}, cellData:[
+                    {content:'单元格291'}, {content:'单元格292'}, {content:'单元格293'}, {content:'单元格294'}, {content:'单元格295'}, {content:'单元格296'}
+                ]
+            },
+            {
+                rowData: {}, treeData:{id:30, pid:28}, cellData:[
+                    {content:'单元格301'}, {content:'单元格302'}, {content:'单元格303'}, {content:'单元格304'}, {content:'单元格305'}, {content:'单元格306'}
+                ]
+            },
+            {
+                rowData: {}, treeData:{id:31, pid:40}, cellData:[
+                    {content:'单元格311'}, {content:'单元格312'}, {content:'单元格313'}, {content:'单元格314'}, {content:'单元格315'}, {content:'单元格316'}
+                ]
+            }
+        ];
+        tb.append(appendData);
+    }, 2500);
+
+
+    window.setTimeout(function(){
+        var appendData = [
+            {
+                rowData: {}, treeData:{id:32, pid:40}, cellData:[
+                    {content:'单元格321'}, {content:'单元格322'}, {content:'单元格323'}, {content:'单元格324'}, {content:'单元格325'}, {content:'单元格326'}
+                ]
+            }
+        ];
+        tb.append(appendData);
+    }, 3000);
+
+
+    window.setTimeout(function(){
+        var appendData = [
+            {
+                rowData: {}, treeData:{id:33, pid:41}, cellData:[
+                    {content:'单元格331'}, {content:'单元格332'}, {content:'单元格333'}, {content:'单元格334'}, {content:'单元格335'}, {content:'单元格336'}
+                ]
+            },
+            {
+                rowData: {}, treeData:{id:34, pid:29}, cellData:[
+                    {content:'单元格341'}, {content:'单元格342'}, {content:'单元格343'}, {content:'单元格344'}, {content:'单元格345'}, {content:'单元格346'}
+                ]
+            },
+            {
+                rowData: {}, treeData:{id:35, pid:7}, cellData:[
+                    {content:'单元格351'}, {content:'单元格352'}, {content:'单元格353'}, {content:'单元格354'}, {content:'单元格355'}, {content:'单元格356'}
+                ]
+            }
+        ];
+        tb.append(appendData);
+    }, 3500);
+
+    window.setTimeout(function(){
+        tb.tree.collapse(6);
+    }, 5000);
+*/
+    function toggle(collapse){
+        var id = parseInt(document.getElementById('txtId').value, 10);
+        if(!isNaN(id)){
+            tb.tree.toggle(id, collapse);
+        }
+    }
+
+    function toggleLevel(collapse){
+        var level = parseInt(document.getElementById('txtLevel').value, 10);
+        if(!isNaN(level)){
+            tb.tree.toggleLevel(level, collapse);
+        }
+    }
+
+    function remove(){
+        var id = parseInt(document.getElementById('txtId').value, 10);
+        if(!isNaN(id)){
+            tb.tree.remove(id);
+        }
+    }
 </script>
