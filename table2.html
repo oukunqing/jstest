@@ -68,6 +68,7 @@
 ID:<input type="text" id="txtId" style="width:50px;" />
 <button onclick="toggle(false);">按ID展开</button>
 <button onclick="toggle(true);">按ID收缩</button>
+<button onclick="remove();">按ID删除</button>
 <br /><br />
 
 <table id="tblist" class="tblist"></table>
@@ -140,13 +141,13 @@ ID:<input type="text" id="txtId" style="width:50px;" />
                 ]
             },
             {
-                rowData: {}, treeData:{id:3, pid:1}, cellData:[
-                    {content:'单元格31'}, {content:'单元格32'}, {content:'单元格33'}, {content:'单元格34'}, {content:'单元格35'}, {content:'单元格36'}
+                rowData: {}, treeData:{id:4, pid:2}, cellData:[
+                    {content:'单元格41'}, {content:'单元格42'}, {content:'单元格43'}, {content:'单元格44'}, {content:'单元格45'}, {content:'单元格46'}
                 ]
             },
             {
-                rowData: {}, treeData:{id:4, pid:2}, cellData:[
-                    {content:'单元格41'}, {content:'单元格42'}, {content:'单元格43'}, {content:'单元格44'}, {content:'单元格45'}, {content:'单元格46'}
+                rowData: {}, treeData:{id:3, pid:1}, cellData:[
+                    {content:'单元格31'}, {content:'单元格32'}, {content:'单元格33'}, {content:'单元格34'}, {content:'单元格35'}, {content:'单元格36'}
                 ]
             },
             {
@@ -275,6 +276,13 @@ ID:<input type="text" id="txtId" style="width:50px;" />
         var level = parseInt(document.getElementById('txtLevel').value, 10);
         if(!isNaN(level)){
             tb.tree.toggleLevel(level, collapse);
+        }
+    }
+
+    function remove(){
+        var id = parseInt(document.getElementById('txtId').value, 10);
+        if(!isNaN(id)){
+            tb.tree.remove(id);
         }
     }
 </script>

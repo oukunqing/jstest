@@ -73,6 +73,24 @@ var $ = $ || {};
                 destination[property] = source[property];
             }
             return destination;
+        },
+        deleteTableRow = function (tr) {
+            if (tr !== null && tr.parentNode != null) {
+                if (tr.parentNode.tagName === 'TBODY' || tr.parentNode.tagName === 'THEAD') {
+                    tr.parentNode.parentNode.deleteRow(tr.rowIndex);
+                } else if (tr.parentNode.tagName === 'TABLE') {
+                    tr.parentNode.deleteRow(tr.rowIndex);
+                }
+            }
+        },
+        getRowIndex = function (tr) {
+            if (tr !== null) {
+                return tr.rowIndex;
+            }
+            return -1;
+        },
+        getTHeadRows = function (tb) {
+            return $.isObject(tb) && tb.tagName === 'TABLE' && tb.tHead ? tb.tHead.rows.length : 0;
         };
 
 
@@ -149,8 +167,25 @@ var $ = $ || {};
                 that.createRow(container, bodyData);
             }
         },
-        append: function (bodyData) {
+        appendBody: function (bodyData) {
             this.createBody(bodyData);
+        },
+        append: function (bodyData, isHeadData) {
+            if (isHeadData) {
+                this.createHead(bodyData);
+            } else {
+                this.createBody(bodyData);
+            }
+        },
+        deleteRow: function (rowIndex) {
+            if (this.table.rows.length > rowIndex) {
+                this.table.deleteRow(rowIndex);
+            }
+        },
+        clearRow: function (keepRows) {
+            for (var i = this.table.rows.length - 1; i >= keepRows; i--) {
+                this.table.deleteRow(i);
+            }
         },
         createRow: function (container, datas, trees, pids, isAppend) {
             var rowIndex = container.rows.length;
@@ -203,7 +238,8 @@ var $ = $ || {};
                     //that.tree.toggle(this.getAttribute('tid'));
                     that.tree[action || 'toggle'](obj.getAttribute('tid'));
                     stopBubble();
-                };
+                }, 
+                trigger = that.options.trigger;
 
             for (var i = 0; i < cols; i++) {
                 var dr = cellData[i], cell = row.insertCell(cellIndex);
@@ -226,19 +262,23 @@ var $ = $ || {};
 
                         addListener(btnSwitch, 'click', function () { func(this, 'toggle'); });
 
-                        if (that.options.trigger.cell) {
+                        if (trigger.cell) {
                             cell.setAttribute('tid', id);
-                            addListener(cell, that.options.trigger.cell[0], function () { console.log('cellclick'); func(this, that.options.trigger.cell[1] || 'toggle'); });
+                            //cell.style.cursor = 'default';
+                            addListener(cell, trigger.cell[0], function () { func(this, trigger.cell[1] || 'toggle'); });
                         }
-                        if (that.options.trigger.row) {
+                        if (trigger.row) {
                             row.setAttribute('tid', id);
-                            addListener(row, that.options.trigger.row[0], function () { console.log('rowclick'); func(this, that.options.trigger.row[1] || 'toggle'); });
+                            //row.style.cursor = 'default';
+                            addListener(row, trigger.row[0], function () { func(this, trigger.row[1] || 'toggle'); });
                         }
                     } else {
                         cell.innerHTML = content;
                     }
+
                     if (isCellSpan(dr.rowSpan)) { cell.rowSpan = dr.rowSpan; }
                     if (isCellSpan(dr.colSpan)) { cell.colSpan = dr.colSpan; }
+
                     that.insertCellProperty(cell, dr);
                 } else {
                     cell.innerHTML = dr;
@@ -278,50 +318,44 @@ var $ = $ || {};
         },
         findRowIndex: function (container, pid) {
             var childs = this.tree.getChildIds(pid), len = childs.length;
-            var obj = doc.getElementById(this.tree.buildId(pid)), rowIndex = 0, idx = container.rows.length;
-            if (len > 0 && obj != null) {
-                var rowId = '', idx = container.rows.length, realPid = 0;
-                //找到父节点下的最后一个子节点（不递归）
+            var tr = doc.getElementById(this.tree.buildId(pid)), rowCount = 0, idx = -1;
+            var headRows = getTHeadRows(this.table);
+
+            if (len > 0 && tr != null) {
+                var id = 0, realPid = 0;
+                //找到父节点下的最后一个有效的直系子节点所在的行
                 for (var i = len - 1; i >= 0; i--) {
-                    obj = document.getElementById(this.tree.buildId(childs[i]));
-                    if (obj != null) {
-                        rowId = obj.getAttribute('id'), realPid = childs[i];
+                    id = childs[i], idx = getRowIndex(doc.getElementById(this.tree.buildId(id))) - headRows;
+                    if (idx >= 0) {
+                        realPid = id;
                         break;
                     }
                 }
-                //如果没找到，就把父节点当成最后一个子节点
-                if (rowId === '') {
-                    obj = doc.getElementById(this.tree.buildId(pid));
-                    if (obj != null) {
-                        rowId = obj.getAttribute('id'), realPid = pid;
-                    }
+                //如果没找到，就把父节点当成最后一个子节点所在行
+                if (idx < 0) {
+                    idx = getRowIndex(doc.getElementById(this.tree.buildId(pid))) - headRows, realPid = idx >= 0 ? pid : 0;
                 }
-                //根据子节点找到所在行数
-                for (var i = 0; i < container.rows.length; i++) {
-                    var id = container.rows[i].getAttribute('id');
-                    if (id !== null && id === rowId) {
-                        idx = i + 1;
-                        break;
-                    }
+
+                if (realPid > 0) {
+                    //再递归查找最后一个子节点所占的总行数
+                    var trees = this.tree.getChildIds(realPid);
+                    rowCount = this.getRowCount(trees, realPid, 0);
                 }
-                //再递归查询子节点下的所有行数
-                var trees = this.tree.getChildIds(realPid);
-                rowIndex = this.findRealRowIndex(trees, realPid, 0);
             }
-            return rowIndex + idx;
+            return rowCount + (idx < 0 ? container.rows.length : idx + 1);
         },
-        findRealRowIndex: function (trees, pid, rowIndex) {
+        getRowCount: function (trees, pid, rowCount) {
             for (var i in trees) {
                 if (!this.tree.hasMap(trees[i])) {
                     break;
                 }
-                rowIndex++;
+                rowCount++;
                 var childs = this.tree.getChildIds(trees[i]);
                 if ($.isArray(childs)) {
-                    this.findRealRowIndex(childs, trees[i], rowIndex);
+                    this.getRowCount(childs, trees[i], rowCount);
                 }
             }
-            return rowIndex;
+            return rowCount;
         }
     };
 
@@ -425,14 +459,13 @@ var $ = $ || {};
                     }
                 }
             }
-            //arr = this.quickSort2(arr, 'level');
 
             for (var i = 0, c = arr.length; i < c; i++) {
-
                 var dr = arr[i].data, isArray = $.isArray(dr), treeData = dr.treeData;
                 var isTree = $.isObject(treeData) && !$.isEmpty(treeData);
                 if (isTree) {
                     var key = this.buildKey(treeData.id), pkey = this.buildKey(treeData.pid);
+                    /*
                     //找不到上级节点，则将上级节点设置为-1，层级设置为0级
                     //上级节点为-1的行会追加到表格的最后
                     if (!this.hasParent(pkey)) {
@@ -440,6 +473,11 @@ var $ = $ || {};
                     } else if (this.hasParent(pkey)) {
                         this.setLevel(dr.treeData, pkey, true);
                     }
+                    */
+                    //设置层级，找不到父级节点的层级设置为0，父级节点设置为-1
+                    //上级节点为-1的行会追加到表格的最后
+                    this.setLevel(dr.treeData, pkey, this.hasParent(pkey));
+
                     if (i === 0 || $.isUndefined(keys[pkey])) {
                         pids.push(treeData.pid || 0);
                     }
@@ -452,21 +490,23 @@ var $ = $ || {};
             //按level层级排序(升序)
             datas = this.quickSort(datas, 'level');
 
+            console.log('datas: ', datas);
+
             return { datas: datas, trees: trees, pids: pids };
         },
-        getRowIds: function (trees, expand, rows) {
+        getRowIds: function (trees, collapse, rows) {
             for (var i in trees) {
                 var id = trees[i];
                 if (!this.hasMap(id)) {
                     break;
                 }
-                //rows.push(doc.getElementById(this.buildId(id)));
                 rows.push(id);
 
-                if (!this.isCollapse(id) || !expand) {
+                //展开时需要屏蔽之前被收缩的子节点
+                if (!this.isCollapse(id) || collapse) {
                     var childs = this.trees[this.buildKey(id)];
                     if ($.isArray(childs)) {
-                        this.getRowIds(childs, expand, rows);
+                        this.getRowIds(childs, collapse, rows);
                     }
                 }
             }
@@ -513,13 +553,13 @@ var $ = $ || {};
             var key = this.buildKey(id);
             return !$.isUndefined(this.collapseCache[key]);
         },
-        expandParent: function(id){
+        expandParent: function (id) {
             var key = this.buildKey(id), data = this.datas[key];
-            if(data && data.treeData){
+            if (data && data.treeData) {
                 var pid = data.treeData.pid || 0, pkey = this.buildKey(pid), pdata = this.datas[pkey];
-                if(pdata){
+                if (pdata) {
                     var btnSwitch = doc.getElementById(this.buildSwitchId(pid));
-                    if(btnSwitch !== null && btnSwitch.getAttribute('expand') === '0'){
+                    if (btnSwitch !== null && btnSwitch.getAttribute('expand') === '0') {
                         this.expand(pid);
                     }
                     this.expandParent(pid);
@@ -536,12 +576,12 @@ var $ = $ || {};
             this.setSwitch(btnSwitch, collapse, false);
 
             //展开时，需要检查父级节点是否是展开状态，若为收缩则展开
-            if(!collapse){
+            if (!collapse) {
                 this.expandParent(id);
             }
 
-            //获取当前节点下的所有子节点，展开和收缩 所获取到的子节点不一定相同，因为展开时需要屏蔽之前被收缩的子节点
-            var childs = this.getChildIds(id), ids = this.getRowIds(childs, !collapse, []);
+            //获取当前节点下的所有子节点
+            var childs = this.getChildIds(id), ids = this.getRowIds(childs, collapse, []);
             //记录收缩状态
             this.setCollapse(id, ids, collapse);
 
@@ -563,7 +603,7 @@ var $ = $ || {};
                 return false;
             }
             //按层级展开时，收缩的层级+1
-            level += collapse ? 0 : 1;
+            level = (level < 0 ? 0 : level) + (collapse ? 0 : 1);
 
             for (var i in this.datas) {
                 var dr = this.datas[i].treeData || {}, id = dr.id;
@@ -581,15 +621,19 @@ var $ = $ || {};
                 }
             }
         },
-        quickSort2: function (arr, key) {
-            if (0 === arr.length) {
-                return [];
+        remove: function (id, keepSelf) {
+            //获取当前节点下的所有子节点
+            var childs = this.getChildIds(id), ids = this.getRowIds(childs, true, []), len = ids.length;
+            for (var i = len - 1; i >= 0; i--) {
+                var tr = doc.getElementById(this.buildId(ids[i]));
+                deleteTableRow(tr);
             }
-            var left = [], right = [], pivot = arr[0], c = arr.length;
-            for (var i = 1; i < c; i++) {
-                arr[i][key] < pivot[key] ? left.push(arr[i]) : right.push(arr[i]);
+            if (!keepSelf) {
+                deleteTableRow(doc.getElementById(this.buildId(id)));
             }
-            return this.quickSort2(left, key).concat(pivot, this.quickSort2(right, key));
+        },
+        removeChild: function (id) {
+            this.remove(id, true);
         },
         quickSort: function (arr, key) {
             if (0 === arr.length) {
