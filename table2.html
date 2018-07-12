@@ -10,7 +10,7 @@
 
         .green{background:#008000;}
 
-        
+        /*
         .table-tree-expand{display:inline-block;
             width:0;
             height:0;
@@ -56,11 +56,20 @@
             margin-right:3px;
             margin-left:0 !important;
         }
+        */
     </style>
     <script type="text/javascript" src="base.js"></script>
     <script type="text/javascript" src="table2.js"></script>
 </head>
 <body>
+层级：<input type="text" id="txtLevel" style="width:50px;" />
+<button onclick="toggleLevel(false);">按层级展开</button>
+<button onclick="toggleLevel(true);">按层级收缩</button>
+ID:<input type="text" id="txtId" style="width:50px;" />
+<button onclick="toggle(false);">按ID展开</button>
+<button onclick="toggle(true);">按ID收缩</button>
+<br /><br />
+
 <table id="tblist" class="tblist"></table>
 <br />
 <table id="tblist1" class="tblist"></table>
@@ -102,7 +111,7 @@
         showTree: true,                 //是否显示树形结构，boolean值： true | false, 默认为false（可以不设置）
         treeCellIndex: 0,               //要显示树形结构的列索引，从0开始，默认为0（可以不设置）
         trigger: {                      //树形收缩/展开触发器，若cell和row同时设置了不同的事件，可能会有事件冒泡
-            //cell: ['click', 'toggle'],  //点击列触发事件，数组或字符串，第1个元素为事件：(click, dblclick)，第2个元素为动作： (toggle, expand, collapse)
+            cell: ['click', 'toggle'],  //点击列触发事件，数组或字符串，第1个元素为事件：(click, dblclick)，第2个元素为动作： (toggle, expand, collapse)
             //row: 'click'                //点击行触发事件，数组或字符串，第1个元素为事件：(click, dblclick)，第2个元素为动作： (toggle, expand, collapse)
         },
         treeOptions:{                   //树形结构参数
@@ -112,7 +121,7 @@
                 collapse: 'collapse'    //节点收缩时的样式
             },
             */
-            className: ['expand', 'collapse'] //可以数组形式，第1个元素为节点展开的样式
+            //className: ['expand', 'collapse'] //可以数组形式，第1个元素为节点展开的样式
         } 
     });
 
@@ -254,4 +263,18 @@
     window.setTimeout(function(){
         tb.tree.collapse(6);
     }, 5000);
+
+    function toggle(collapse){
+        var id = parseInt(document.getElementById('txtId').value, 10);
+        if(!isNaN(id)){
+            tb.tree.toggle(id, collapse);
+        }
+    }
+
+    function toggleLevel(collapse){
+        var level = parseInt(document.getElementById('txtLevel').value, 10);
+        if(!isNaN(level)){
+            tb.tree.toggleLevel(level, collapse);
+        }
+    }
 </script>

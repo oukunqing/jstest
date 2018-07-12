@@ -4,6 +4,35 @@ var $ = $ || {};
 
 !function ($) {
     var doc = document,
+        head = document.getElementsByTagName('head')[0],
+        getLocationPath = function(){
+            return location.href.substring(0, location.href.lastIndexOf('/') + 1);
+        },
+        getFileName = function(){
+            var el = doc.getElementsByTagName('script'); 
+            var src = el[el.length -1].src, arr = src.split('/'), len = arr.length; 
+            return arr[len-1].split('?')[0];
+        },
+        thisFileName = getFileName(),
+        getFilePath = function(name, path){
+            var el = doc.getElementsByTagName('script'); 
+            for (var i = 0,c = el.length; i < c; i++) {
+                var si = el[i].src.lastIndexOf('/');
+                if(el[i].src != '' && el[i].src.substr(si + 1).split('?')[0] == name){
+                    return el[i].src.substring(0, si + 1).replace(path, '');
+                }
+            }
+        },
+        getLinkStyle = function(path, name){
+            var link = document.createElement('link');
+            var id = link.id = 'table-tree-style';
+            if(!doc.getElementById(id)){
+                link.setAttribute('rel','stylesheet');
+                link.setAttribute('type','text/css');
+                link.setAttribute('href', path + name + '?' + new Date().getTime());
+                head.appendChild(link);
+            }
+        },
         createElement = function (nodeName, parent, fn) {
             var element = doc.createElement(nodeName); fn && fn(element); parent && parent.appendChild(element);
             return element;
@@ -190,7 +219,7 @@ var $ = $ || {};
                         that.tree.setMap(id, false);
                         content = that.tree.buildSwitch(id, treeData.level) + content;
                         //临时测试用
-                        content += ' [ pid: ' + treeData.pid + ', level: ' + treeData.level + ' ]';
+                        content += ' [ id: ' + treeData.id + ', pid: ' + treeData.pid + ', level: ' + treeData.level + ' ]';
                         cell.innerHTML = content;
 
                         var btnSwitch = doc.getElementById(that.tree.buildSwitchId(id));
@@ -297,6 +326,10 @@ var $ = $ || {};
     };
 
     function tableTree(isTree, options) {
+        if($.isUndefined(options.className) || $.isEmpty(options.className)){
+            getLinkStyle(getFilePath(thisFileName, getLocationPath()), 'table.css');
+        }
+
         this.options = extendProperty({
             spaceWidth: 16,
             className: {
@@ -312,6 +345,7 @@ var $ = $ || {};
                 collapse: className[1] || ''
             };
         }
+
         this.isTree = typeof isTree === 'boolean' ? isTree : false;
         this.collapseCache = {};
         this.datas = {};
@@ -420,7 +454,7 @@ var $ = $ || {};
 
             return { datas: datas, trees: trees, pids: pids };
         },
-        getRowIds: function(trees, pid, expand, rows){
+        getRowIds: function(trees, expand, rows){
             for (var i in trees) {
                 var id = trees[i];
                 if (!this.hasMap(id)) {
@@ -432,7 +466,7 @@ var $ = $ || {};
                 if(!this.isCollapse(id) || !expand){
                     var childs = this.trees[this.buildKey(id)];
                     if ($.isArray(childs)) {
-                        this.getRowIds(childs, id, expand, rows);
+                        this.getRowIds(childs, expand, rows);
                     }
                 }
             }
@@ -445,9 +479,6 @@ var $ = $ || {};
             }
             return w;
         },
-        buildArrow: function(){
-
-        },
         buildSwitchId: function (id) {
             return 'switch_' + id;
         },
@@ -456,6 +487,11 @@ var $ = $ || {};
                 this.buildSwitchId(id), id, this.options.className.expand, this.buildSpace(width)
             );
             return a;
+        },
+        setSwitch: function(obj, collapse, isLevel){
+            obj.setAttribute('expand', collapse ? 0 : 1);
+            obj.className = this.options.className[collapse ? 'collapse' : 'expand'];
+            //obj.innerHTML = collapse ? ' ++ ' : ' -- ';
         },
         setCollapse: function(pid, ids, collapse){
             var key = this.buildKey(pid);
@@ -476,24 +512,25 @@ var $ = $ || {};
         },
         toggle: function (id, collapse) {
             var btnSwitch = doc.getElementById(this.buildSwitchId(id));
-
             if(btnSwitch === null){
                 return false;
             }
-
             collapse = $.isBoolean(collapse, btnSwitch.getAttribute('expand') === '1');
+            /*
             btnSwitch.setAttribute('expand', collapse ? 0 : 1);
             btnSwitch.className = this.options.className[collapse ? 'collapse' : 'expand'];
             //btnSwitch.innerHTML = collapse ? ' ++ ' : ' -- ';
-
+*/
+            this.setSwitch(btnSwitch, collapse, false);
+           
             //获取当前节点下的所有子节点，展开和收缩 所获取到的子节点不一定相同，因为展开时需要屏蔽之前被收缩的子节点
-            var ids = this.getRowIds(this.getChildIds(id), id, !collapse, []);
+            var childs = this.getChildIds(id), ids = this.getRowIds(childs, !collapse, []);
             //记录收缩状态
             this.setCollapse(id, ids, collapse);
 
             for(var i = ids.length -1; i>=0; i--){
                 var obj = doc.getElementById(this.buildId(ids[i]));
-                if(obj != null){
+                if(obj !== null){
                     obj.style.display = collapse ? 'none' : '';
                 }
             }
@@ -504,8 +541,39 @@ var $ = $ || {};
         expand: function (id) {
             this.toggle(id, false);
         },
-        expandLevel: function (level) {
+        toggleLevel: function (level, collapse) {
+            /*
+            var childs = [];
+            for(var i in this.datas){
+                var dr = this.datas[i].treeData;
+                if(dr && dr.level === level){
+                    childs.push(dr.id);
+                }
+            }
 
+            console.log('childs: ', childs);
+            var ids = this.getRowIds(childs, false, []);
+
+            console.log('ids: ', ids);
+            */
+            if(!$.isInteger(level)){
+                return false;
+            }
+            //层级展开时，收缩的层级+1
+            level += collapse ? 0 : 1;
+
+            for(var i in this.datas){
+                var dr = this.datas[i].treeData || {}, id = dr.id;
+                var obj = doc.getElementById(this.buildId(id)), btnSwitch = doc.getElementById(this.buildSwitchId(id));
+                if(obj !== null){
+                    obj.style.display = dr.level <= level ? '' : 'none';
+                }
+                //只设置当前等级的图标状态
+                if(dr.level === level){
+                    this.setSwitch(btnSwitch, true, true);
+                    this.setCollapse(id, [], true);
+                }
+            }
         },
         quickSort2: function (arr, key) {
             if (0 === arr.length) {
