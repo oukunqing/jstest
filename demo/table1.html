@@ -58,8 +58,8 @@
         }
         */
     </style>
-    <script type="text/javascript" src="base.js"></script>
-    <script type="text/javascript" src="table.js"></script>
+    <script type="text/javascript" src="../oui/oui.js"></script>
+    <script type="text/javascript" src="../oui/oui.table.js"></script>
 </head>
 <body>
 层级：<input type="text" id="txtLevel" style="width:50px;" />
@@ -2597,7 +2597,7 @@ ID:<input type="text" id="txtId" style="width:50px;" />
         { rowData: {}, treeData: { id: "c2953", pid: "d2510" }, cellData: ["fjlongyan11通道1"] }
     ];
         
-    var tb = new $.table({
+    var tb = new oui.table({
         table: 'tblist',                //表格（对象 或 Id 或 null)，为null则自动创建表格对象（可以不设置）
         parent: document.body,          //表格父节点，默认为 document.body （可以不设置）
         //headData: headData,             //初始化时要创建的表格头部数据（可以不设置），数据格式参考示例说明

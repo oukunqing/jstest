@@ -121,28 +121,29 @@ var oui = function() {
             var postfix = isString(filePath) && filePath ? filePath + (filePath.indexOf('?') >= 0 ? '&' : '?') : '';
             return postfix + new Date().getMilliseconds();
         },
-        loadLinkStyle = function(path, name, id) {
-            if (!isUndefined(id) && doc.getElementById(id)) {
-                return false;
-            }
-            return createElement('link', head, function(el) {
+        loadLinkStyle = function (path, name, id) {
+            if (!isUndefined(id) && doc.getElementById(id)) { return false; }
+            return createElement('link', head, function (el) {
                 setAttribute(el, {
-                    id: id || null, rel: 'stylesheet', type: 'text/css', href: setNoCache(path + name)
+                    id: id || null, type: 'text/css', rel: 'stylesheet', href: setNoCache(path + name)
                 }, true);
-            })
+            });
         },
-        loadJsScript = function(url, callback) {
-            var node = createElement('script', head, function(el) {
-                el.async = true, el.charset = 'utf-8', el.src = setNoCache(url);
+        loadJsScript = function (url, callback) {
+            var node = createElement('script', head, function (el) {
+                el.type = 'text/javascript', el.async = true, el.src = setNoCache(url), el.charset = 'utf-8';
             }), ev = node.attachEvent;
 
-            if (evt && !(ev.toString && ev.toString().indexOf('[native code') < 0)) {
-                node.attachEvent('onreadystatechange', function(e) { onScriptLoad(e, url); });
+            if (ev && !(ev.toString && ev.toString().indexOf('[native code]') < 0)) {
+                node.attachEvent('onreadystatechange', function (e) { onScriptLoad(e, url); });
             } else {
-                node.addEventListener('load', function(e) { onScriptLoad(e, url); }, false);
+                node.addEventListener('load', function (e) { onScriptLoad(e, url); }, false);
             }
 
-            function onScriptLoad(e, url) { head.removeChild(node); onCallback(); }
+            function onScriptLoad(e, url) {
+                var debug = !isUndefined(getQueryString()['debug']);
+                !debug && head.removeChild(node), onCallback();
+            }
             function onCallback() { isFunction(callback) && callback(); }
 
             return node;

@@ -58,8 +58,8 @@
         }
         */
     </style>
-    <script type="text/javascript" src="base.js"></script>
-    <script type="text/javascript" src="table.js"></script>
+    <script type="text/javascript" src="../oui/oui.js"></script>
+    <script type="text/javascript" src="../oui/oui.table.js"></script>
 </head>
 <body>
 层级：<input type="text" id="txtLevel" style="width:50px;" />
@@ -299,5 +299,7 @@ ID:<input type="text" id="txtId" style="width:50px;" />
         tb.tree.select(id);
     }
 
-    //oui.loadJsScript('1.js');
+    oui.loadJsScript('../crc.js', function(){
+        console.log('异步加载JS文件完成：');
+    });;
 </script>

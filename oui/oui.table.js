@@ -186,7 +186,10 @@
                     that.tree[action || 'toggle'](obj.getAttribute('tid'));
                     $.stopBubble();
                 },
-                trigger = that.options.trigger;
+                trigger = that.options.trigger,
+                set = function(){
+
+                };
 
             for (var i = 0; i < cols; i++) {
                 var dr = cellData[i], cell = row.insertCell(cellIndex);
