@@ -1,65 +1,18 @@
 "use strict";
 
-var $ = $ || {};
-
 !function ($) {
     var doc = document,
         head = document.getElementsByTagName('head')[0],
-        getLocationPath = function () {
-            return location.href.substring(0, location.href.lastIndexOf('/') + 1);
-        },
-        getFileName = function (fileName) {
-            if (fileName) {
-                return fileName.substr(0, fileName.lastIndexOf('.'));
-            } else {
-                var el = doc.getElementsByTagName('script');
-                var src = el[el.length - 1].src, arr = src.split('/'), len = arr.length;
-                return arr[len - 1].split('?')[0];
-            }
-        }, thisFileName = getFileName(),
-        getFilePath = function (name, path) {
-            var el = doc.getElementsByTagName('script');
-            for (var i = 0, c = el.length; i < c; i++) {
-                var si = el[i].src.lastIndexOf('/');
-                if (el[i].src != '' && el[i].src.substr(si + 1).split('?')[0] == name) {
-                    return el[i].src.substring(0, si + 1).replace(path, '');
-                }
-            }
-        },
-        getLinkStyle = function (path, name) {
-            var link = document.createElement('link');
-            var id = link.id = 'table-tree-style';
-            if (!doc.getElementById(id)) {
-                link.setAttribute('rel', 'stylesheet');
-                link.setAttribute('type', 'text/css');
-                link.setAttribute('href', path + name + '?' + new Date().getMilliseconds());
-                head.appendChild(link);
-            }
-        },
-        createElement = function (nodeName, parent, fn) {
-            var element = doc.createElement(nodeName); fn && fn(element); parent && parent.appendChild(element);
-            return element;
-        },
-        addListener = function (element, e, fn) {
-            element.addEventListener ? element.addEventListener(e, fn, false) : element.attachEvent("on" + e, fn);
-        },
-        removeListener = function (element, e, fn) {
-            element.removeEventListener ? element.removeEventListener(e, fn, false) : element.detachEvent("on" + e, fn);
-        },
-        stopBubble = function (ev) {
-            ev = ev || window.event || arguments.callee.caller.arguments[0];
-            if (ev.stopPropagation) { ev.stopPropagation(); } else { ev.cancelBubble = true; }
-            if (ev.preventDefault) { ev.preventDefault(); } else { ev.returnValue = false; }
-        },
+        thisFilePath = $.getScriptFilePath(),
         isCellSpan = function (span) {
-            return typeof span === 'number' && span > 0;
+            return $.isNumber(span) && span > 0;
         },
         isTable = function (tb) {
-            return typeof tb === 'object' && tb.tagName === 'TABLE' && typeof tb.nodeType === 'number';
+            return $.isObject(tb) && $.isNumber(tb.nodeType) && tb.tagName === 'TABLE';
         },
         isString = function () {
             for (var i = 0; i < arguments.length; i++) {
-                if (typeof arguments[i] === 'string' && arguments[i].length > 0) {
+                if ($.isString(arguments[i])&& arguments[i].length > 0) {
                     return true;
                 }
             }
@@ -70,12 +23,6 @@ var $ = $ || {};
                 return $.isArray(data[0]) || $.isObject(data[0]);
             }
             return false;
-        },
-        extendProperty = function (destination, source) {
-            for (var property in source) {
-                destination[property] = source[property];
-            }
-            return destination;
         },
         deleteTableRow = function (tr) {
             if (tr !== null && tr.parentNode != null) {
@@ -96,7 +43,7 @@ var $ = $ || {};
 
     function table(options) {
         var that = this;
-        that.options = extendProperty({
+        that.options = $.extend({
             table: null,
             parent: doc.body,
             showTree: false,
@@ -119,7 +66,6 @@ var $ = $ || {};
         if ($.isString(trigger.row)) {
             that.options.trigger.row = [trigger.row, 'toggle'];
         }
-
         if (!isTable(that.table)) {
             if (isString(that.table)) {
                 that.table = doc.getElementById(that.table);
@@ -238,7 +184,7 @@ var $ = $ || {};
                     //that.tree.toggle(this.getAttribute('tid'));
                     //需要给相关的tr td 和 图标 设置 tid 属性
                     that.tree[action || 'toggle'](obj.getAttribute('tid'));
-                    stopBubble();
+                    $.stopBubble();
                 },
                 trigger = that.options.trigger;
 
@@ -262,15 +208,15 @@ var $ = $ || {};
 
                     var btnSwitch = doc.getElementById(that.tree.buildSwitchId(id));
 
-                    addListener(btnSwitch, 'click', function () { func(this, 'toggle'); });
+                    $.addListener(btnSwitch, 'click', function () { func(this, 'toggle'); });
 
                     if (trigger.cell) {
                         cell.setAttribute('tid', id);
-                        addListener(cell, trigger.cell[0], function () { func(this, trigger.cell[1] || 'toggle'); });
+                        $.addListener(cell, trigger.cell[0], function () { func(this, trigger.cell[1] || 'toggle'); });
                     }
                     if (trigger.row) {
                         row.setAttribute('tid', id);
-                        addListener(row, trigger.row[0], function () { func(this, trigger.row[1] || 'toggle'); });
+                        $.addListener(row, trigger.row[0], function () { func(this, trigger.row[1] || 'toggle'); });
                     }
                 } else {
                     cell.innerHTML = content;
@@ -287,23 +233,23 @@ var $ = $ || {};
 
             return cell;
         },
-        insertCellProperty: function (container, dr) {
+        insertCellProperty: function (element, dr) {
             if ($.isObject(dr.style)) {
                 for (var k in dr.style) {
-                    container.style[k] = dr.style[k];
+                    element.style[k] = dr.style[k];
                 }
             } else if ($.isString(dr.style)) {
-                container.style.cssText = dr.style;
+                element.style.cssText = dr.style;
             }
             if ($.isObject(dr.event)) {
                 for (var k in dr.event) {
-                    addListener(container, k, dr.event[k]);
+                    $.addListener(element, k, dr.event[k]);
                 }
             }
             var attr = dr.attribute || dr.attr || dr.property || dr.prop;
             if ($.isObject(attr)) {
                 for (var k in attr) {
-                    container.setAttribute(k, attr[k]);
+                    element.setAttribute(k, attr[k]);
                 }
             }
         },
@@ -374,10 +320,13 @@ var $ = $ || {};
 
     function tableTree(isTree, options) {
         if ($.isUndefined(options.className) || $.isEmpty(options.className)) {
-            getLinkStyle(getFilePath(thisFileName, getLocationPath()), getFileName(thisFileName) + '.css');
+            console.log('thisFilePath: ', thisFilePath);
+            var path = $.getFilePath(thisFilePath);
+            console.log('path: ', path, ', name: ', $.getFileName(thisFilePath, true) );
+            $.loadLinkStyle($.getFilePath(thisFilePath), $.getFileName(thisFilePath, true) + '.css');
         }
 
-        this.options = extendProperty({
+        this.options = $.extend({
             spaceWidth: 16,
             className: {
                 expand: 'table-tree-expand',
@@ -578,7 +527,6 @@ var $ = $ || {};
             if (btnSwitch === null) {
                 return false;
             }
-            console.log('toggle: ', id, collapse);
             //判断收缩还是展开
             collapse = $.isBoolean(collapse, btnSwitch.getAttribute('expand') === '1');
             this.setSwitch(btnSwitch, collapse, false);
@@ -687,8 +635,5 @@ var $ = $ || {};
         }
     };
 
-
-
-
     $.table = table;
-}($);
+}(oui);
